@@ -1,3 +1,7 @@
+#' @importFrom rlang env_has
+#' @importFrom rlang env_poke
+#' @import Formula
+
 #univariate regression function
 zic.reg = function(fmla = NULL,
                    data,
@@ -19,23 +23,23 @@ zic.reg = function(fmla = NULL,
                    ...) {
   if (!env_has(e.check, "univ.check"))
     check_uni_args()
-  
+
   dist      = match_arg(dist, c("pois", "nbinom"))
   link.ct   = match_arg(link.ct, c("sqrt", "identity", "log"))
   link.zi   = match_arg(link.zi, c("logit", "probit", "cauchit", "log", "cloglog"))
   optimizer = match_arg(optimizer, c("nlm", "optim"))
-  
-  
+
+
   if (!env_has(e.check, "zi.dens.checks"))
     env_poke(e.check, "zi.dens.checks", T)
   on.exit(rm("zi.dens.checks", envir = e.check), add = T)
-  
+
   environment(zic.ll) = environment()
   environment(nbinom.grad) = environment()
   environment(pois.grad) = environment()
-  
+
   nb = dist == "nbinom"
-  
+
   if (!is.null(fmla)) {
     if (missing(data)) {
       data = environment(fmla)
@@ -43,9 +47,9 @@ zic.reg = function(fmla = NULL,
         warning("Data not supplied to function, looking in parent environment.")
       }
     }
-    
+
     fmla = as.Formula(fmla)
-    
+
     #get call for model frame
     mf = match.call(expand.dots = F)
     m = match(c("data", "weights", "subset", "na.action"), names(mf), 0)
@@ -54,29 +58,29 @@ zic.reg = function(fmla = NULL,
     mf$formula = fmla
     mf[[1L]] <- quote(stats::model.frame)
     mf <- eval(mf, parent.frame())
-    
+
     #set up data
     y = model.response(mf)
     X = model.matrix(fmla, mf, rhs = 1)
     z = model.matrix(fmla, mf, rhs = 2)
-    
-    
-    
+
+
+
     weights = if (!is.null(model.weights(mf)))
       model.weights(mf)
     else
       rep(1, length(y))
     offset.ct = get.offset(attr(fmla, "rhs")[[1]], mf)
     offset.zi = get.offset(attr(fmla, "rhs")[[2]], mf)
-    
+
   }
-  
+
   assert(
     is.null(starts) ||
       ncol(X) + ncol(z) + sum(grepl("nb", dist)) == length(starts),
     "Vector of starting values (`starts`) is not of correct length."
   )
-  
+
   #get starting values using glm, or simplex run
   if (is.null(starts)) {
     start.zi = glm.fit(
@@ -97,14 +101,14 @@ zic.reg = function(fmla = NULL,
       c(start.ct, start.zi)
     else
       c(start.ct, start.zi, 0)
-  
-    
+
+
   }
-  
-  
+
+
   # Check and replace required defaults
   opts = list(...)
-  
+
   if (!is.null(opts$hessian) && opts$hessian == F)
     warning("Arg `hessian` must be true; changing this automatically.")
   if ((!is.null(opts$control[["fnscale"]]) &&
@@ -112,16 +116,16 @@ zic.reg = function(fmla = NULL,
       (!is.null(opts$fscale) && opts$fscale < 0))
     warning("Function must not be inverted; changing automatically.")
   opts$hessian = T
-  
-  
+
+
   # Add in optional defaults
   default.names = switch(
     optimizer,
     "optim" = c("maxit", "reltol"),
     "nlm" = c("iterlim", "gradtol")
   )
-  
-  
+
+
   #main optimization, passing additional args via ... using defaults
   res = #
     if (optimizer == "optim") {
@@ -159,9 +163,9 @@ zic.reg = function(fmla = NULL,
   niter = switch(optimizer,
                  "optim" = res$counts[1],
                  "nlm" = res$iterations)
-  
-  
-  
+
+
+
   if ((optimizer == "optim" && convergence != 0) ||
       (optimizer == "nlm" && convergence > 2))
     warning(
@@ -172,38 +176,38 @@ zic.reg = function(fmla = NULL,
         convergence
       )
     )
-  
+
   npar = length(coefs)
   hess = hess.orig = res$hessian
   tol = .Machine$double.eps
-  
+
   covmat = covmat.orig = tryCatch(
     solve(hess, tol = tol),
     error = function(e)
       matrix(NA, npar, npar)
   )
-  
-  
-  
+
+
+
   #transform hessian if negbin to get correct SEs for dispersion
   if (nb) {
     coefs[npar] = exp(coefs[npar])
     mult = 1 / coefs[npar]
-    
+
     if (mult < 5e-2) {
       tol = 1e-100
       warning(
         "Dispersion parameter suspiciously large; negative binomial distribution may be inappropriate."
       )
     }
-    
+
     hess[, npar] = hess[, npar] * mult
     hess[npar, ] = hess[npar, ] * mult
     covmat = solve(hess, tol=tol)
-    
+
   }
-  
-  
+
+
   se = sqrt(diag(covmat))
   ztest = coefs / se
   pval = 2 * pnorm(abs(ztest), lower.tail = F)
@@ -221,7 +225,7 @@ zic.reg = function(fmla = NULL,
   } else {
     coefmat.ndisp = coefmat.all
   }
-  
+
   sum.mat.ct = head(coefmat.ndisp, k.ct)
   sum.mat.zi = tail(coefmat.ndisp, k.zi)
   names(se) = names(coefs) = #
@@ -233,7 +237,7 @@ zic.reg = function(fmla = NULL,
         "Theta"
         else
           NULL))
-  
+
   colnames(sum.mat.ct) = colnames(sum.mat.zi) = colnames(coefmat.all) = c("Estimate",
                                                   "Std. Error",
                                                   "z-score",
@@ -241,7 +245,7 @@ zic.reg = function(fmla = NULL,
   rownames(sum.mat.ct) = colnames(X)
   rownames(sum.mat.zi) = colnames(z)
   rownames(coefmat.all) = c(colnames(X), colnames(z), if(nb) rownames(theta) else NULL)
-  
+
   out = list(
     call = match.call(),
     obj = "Zero Inflated Count Model",
@@ -280,7 +284,7 @@ zic.reg = function(fmla = NULL,
     else
       NULL
   )
-  
+
   class(out) = "zicreg"
   return(out)
 }
