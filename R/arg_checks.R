@@ -115,7 +115,7 @@ check_dist_args = function(pos = 1,
          "Negative values of `q` or `x` supplied.",
          type="warning")
 
-  assert(!missingArg(psi, envir = parent.frame(pos)),
+  assert(!missingArg(as.symbol("psi"), envir = parent.frame(pos), eval=T),
          "`psi` must be specified.")
 
   assert(
