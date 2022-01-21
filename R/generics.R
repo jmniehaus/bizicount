@@ -1,5 +1,11 @@
+#' @importFrom texreg extract
+#' @importFrom texreg createTexreg
+#' @importFrom DHARMa createDHARMa
+
+
+
 #' @export
-print.bizicount= function(x){
+print.bizicount= function(x, ...){
 
   for(i in 1:2){
     cat(paste("\nCount:", x$outcomes[i]), "\n")
@@ -19,34 +25,35 @@ print.bizicount= function(x){
 
 
 #' @export
-logLik.bizicount = function(obj) obj$loglik
+logLik.bizicount = function(object, ...) object$loglik
+
+# AIC precomputed using k=2 in regression fn, so adjust it here according to AIC's k arg
+#' @export
+AIC.bizicount = function(object, ..., k=2) k/2*object$aic
 
 #' @export
-AIC.bizicount = function(obj) obj$aic
+BIC.bizicount = function(object, ...) object$bic
 
 #' @export
-BIC.bizicount = function(obj) obj$bic
+nobs.bizicount = function(object, ...) object$nobs
 
 #' @export
-nobs.bizicount = function(obj) obj$nobs
+vcov.bizicount = function(object, ...) object$covmat
 
 #' @export
-vcov.bizicount = function(obj) obj$covmat
-
-#' @export
-coef.bizicount = function(x, id=T){
+coef.bizicount = function(object, id=T, ...){
   if(id)
-    return(x$coef)
+    return(object$coef)
   else
-    return(x$coef.nid)
+    return(object$coef.nid)
 }
 
 #' @export
-fitted.bizicount = function(x){
+fitted.bizicount = function(object, ...){
 
-  with(x, {
+  with(object, {
 
-  if(is.null(x$model))
+  if(is.null(object$model))
     stop("bizicount() model must be fit with `keep=TRUE` to get fitted values.", call.=F)
 
   n.zi = sum(grepl("zi", margins))
@@ -75,22 +82,22 @@ fitted.bizicount = function(x){
   }
 
   out = do.call(cbind, fit)
-  colnames(out) = paste0("fit_", x$outcomes)
+  colnames(out) = paste0("fit_", object$outcomes)
   return(out)
   })
 }
 
 #' @export
-summary.bizicount = function(x){
-  if(!any(class(x)=="bizicount"))
+summary.bizicount = function(object, ...){
+  if(!any(class(object)=="bizicount"))
     stop("Object must be of class `bizicount`.")
 
-  class(x) = c("summary.bizicount", "bizicount")
-  return(x)
+  class(object) = c("summary.bizicount", "bizicount")
+  return(object)
 }
 
 #' @export
-print.summary.bizicount = function(x, stars=T){
+print.summary.bizicount = function(x, stars=T, ...){
   old = getOption("show.signif.stars")
   options(show.signif.stars = stars)
   on.exit(options(show.signif.stars = old),
@@ -269,18 +276,18 @@ setMethod("extract",
           definition= extract.bizicount)
 
 #' @export
-simulate.bizicount = function(mod, n=250, seed=123){
-  if(is.null(mod$model))
+simulate.bizicount = function(object, nsim=250, seed=123, ...){
+  if(is.null(object$model))
     stop("Must set `keep=T` in bizicount() to do diagnostics on model object.")
 
   if(!is.null(seed))
     set.seed(seed)
 
-  with(mod, {
+  with(object, {
 
   #observed = model$model[["y"]]
   n.zi = sum(grepl("zi", margins))
-  nob = mod$nobs
+  nob = object$nobs
   X = model[["X"]]
   Z = model[["Z"]]
   offset.ct = model[["offset.ct"]]
@@ -338,7 +345,7 @@ simulate.bizicount = function(mod, n=250, seed=123){
 
   sims = list()
   for(j in 1:2){
-    sims[[j]] = replicate(n, do.call(paste0("r", margins[j]), margin.args[[j]]))
+    sims[[j]] = replicate(nsim, do.call(paste0("r", margins[j]), margin.args[[j]]))
 
   }
 
@@ -350,19 +357,19 @@ simulate.bizicount = function(mod, n=250, seed=123){
 }
 
 #' @export
-make.DHARMa = function(model, n=250, seed=123, method="PIT"){
-  if( !any(class(model) == "bizicount") )
+make.DHARMa = function(object, nsim=250, seed=123, method="PIT"){
+  if( !any(class(object) == "bizicount") )
     stop("Function must be applied to bizicount class object.")
 
-  sims = simulate(model, n=n, seed=seed)
-  fit = fitted(model)
+  sims = simulate(object, nsim=nsim, seed=seed)
+  fit = fitted(object)
 
   dharmas = list()
 
   for(i in 1:2){
     dharmas[[i]] = createDHARMa(
       simulatedResponse = sims[[i]],
-      observedResponse = model$model[["y"]][,i],
+      observedResponse = object$model[["y"]][,i],
       fittedPredictedResponse = fit[,i],
       integerResponse = T,
       seed=FALSE,
@@ -376,17 +383,17 @@ make.DHARMa = function(model, n=250, seed=123, method="PIT"){
 
 ## Generics for univariate regression model (zic.reg)
 #' @export
-summary.zicreg = function(x) {
-  if (!any(class(x) == "zicreg"))
+summary.zicreg = function(object, ...) {
+  if (!any(class(object) == "zicreg"))
     stop("Object must be of class `zicreg`.")
 
-  class(x) = c("summary.zicreg", "zicreg")
-  return(x)
+  class(object) = c("summary.zicreg", "zicreg")
+  return(object)
 }
 
 # Print method for zicmod class object
 #' @export
-print.summary.zicreg = function(x) {
+print.summary.zicreg = function(x, ...) {
   cat(paste("Call:", deparse1(x$call)), "\n")
   cat("\n", x$obj, paste0("(dist = ", x$dist, ")"), "\n")
   cat(
@@ -410,7 +417,7 @@ print.summary.zicreg = function(x) {
 }
 
 #' @export
-print.zicreg = function(x) {
+print.zicreg = function(x, ...) {
   cat(deparse1(x$call), "\n\n")
   cat("Count Model Coefficients:\n")
   print(x$coefmat.ct[, 1])
@@ -428,41 +435,45 @@ print.zicreg = function(x) {
 
 
 #' @export
-coef.zicreg = function(x) {
-  n.ct = paste0("ct_", rownames(x$coefmat.ct))
-  n.zi = paste0("zi_", rownames(x$coefmat.zi))
-  cs   = c(x$coefmat.ct[, 1], x$coefmat.zi[, 1])
+coef.zicreg = function(object, ...) {
+  n.ct = paste0("ct_", rownames(object$coefmat.ct))
+  n.zi = paste0("zi_", rownames(object$coefmat.zi))
+  cs   = c(object$coefmat.ct[, 1], object$coefmat.zi[, 1])
   names(cs) = c(n.ct, n.zi)
   cs
 }
 
 #' @export
-logLik.zicreg = function(x)
-  x$loglik
+logLik.zicreg = function(object, ...)
+  object$loglik
 
 #' @export
-nobs.zicreg = function(x)
-  x$nobs
+nobs.zicreg = function(object, ...)
+  object$nobs
 
 #' @export
-BIC.zicreg = function(x)
-  x$bic
+BIC.zicreg = function(object, ...)
+  object$bic
 
 #' @export
-AIC.zicreg = function(x)
-  x$aic
+AIC.zicreg = function(object, ..., k=2)
+  2/k * object$aic
 
 #' @export
-simulate.zicreg = function(mod, n = 250, seed=123) {
-  if (is.null(mod$model))
+vcov.zicreg = function(object, ...)
+  object$covmat
+
+#' @export
+simulate.zicreg = function(object, nsim = 250, seed=123, ...) {
+  if (is.null(object$model))
     stop("Must set `keep=T` in zic.reg() to do diagnostics on model object.")
 
   if(!is.null(seed))
     set.seed(seed)
 
-  with(mod, {
+  with(object, {
     #observed = model$model[["y"]]
-    nob = mod$nobs
+    nob = object$nobs
     X = model[["X"]]
     Z = model[["z"]]
     offset.ct = model[["offset.ct"]]
@@ -492,7 +503,7 @@ simulate.zicreg = function(mod, n = 250, seed=123) {
     )
 
     set.seed(seed)
-    sims = replicate(n, do.call(if (grepl("p", dist))
+    sims = replicate(nsim, do.call(if (grepl("p", dist))
       "rzip"
       else
         "rzinb", dist.args))
@@ -504,11 +515,11 @@ simulate.zicreg = function(mod, n = 250, seed=123) {
 }
 
 #' @export
-fitted.zicreg = function(mod) {
-  if (is.null(mod$model))
+fitted.zicreg = function(object, ...) {
+  if (is.null(object$model))
     stop("`Keep` must be set to TRUE in original model call in order to obtain fitted mean.")
 
-  with(mod, {
+  with(object, {
     X = model[["X"]]
     Z = model[["z"]]
     offset.ct = model[["offset.ct"]]
@@ -525,10 +536,11 @@ fitted.zicreg = function(mod) {
 }
 
 #' @export
-predict.zicreg = function(mod,
+predict.zicreg = function(object,
                           newdata = NULL,
                           y.new = NULL,
-                          type = "mean"
+                          type = "mean",
+                          ...
 ) {
 
   type = match_arg(type, choices = c("mean", "prob", "psi", "lambda"))
@@ -546,9 +558,9 @@ predict.zicreg = function(mod,
     )
 
   if (is.null(newdata) && type == "mean")
-    return(fitted(mod))
+    return(fitted(object))
 
-  with(mod, {
+  with(object, {
     Z = model$z
     X = model$X
     ct = coefmat.ct[, 1]
@@ -582,7 +594,7 @@ predict.zicreg = function(mod,
     } else {
 
       coef.names = grep("Intercept",
-                        names(coef(mod)),
+                        names(coef(object)),
                         value = T,
                         invert = T)
       coef.names = sub("^.{3}", "", coef.names)

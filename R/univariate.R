@@ -21,8 +21,148 @@ zic.reg = function(fmla = NULL,
                    warn.parent = T,
                    keep = F,
                    ...) {
+
   if (!env_has(e.check, "univ.check"))
     check_uni_args()
+
+  # Univariate Likelihood
+  zic.ll = function(parms,
+                    grad = F) {
+    kx = ncol(X)
+    kz = ncol(z)
+    #setup parameters based on distribution
+    if (dist == "pois") {
+      ct = head(parms, kx)
+      zi = tail(parms, kz)
+    } else {
+      ct = head(parms, kx)
+      zi = parms[(kx + 1):(kx + kz)]
+      disp = exp(tail(parms, 1))
+    }
+
+    #get linear predictor, probability, mean
+    eta.ct = X %*% ct + offset.ct
+    eta.zi = z %*% zi + offset.zi
+    psi = make.link(link.zi)$linkinv(eta.zi)
+    lam = make.link(link.ct)$linkinv(eta.ct)
+
+    ll = withCallingHandlers(switch(
+      dist,
+      "pois" = dzip(
+        y,
+        lambda = lam,
+        psi = psi,
+        log = T
+      ),
+      "nbinom"  = dzinb(
+        y,
+        size = disp,
+        psi = psi,
+        mu = lam,
+        log = T
+      )
+    ),
+    warning = ll.suppress)
+
+    ll =  sum(ll * weights)
+
+    if (grad)
+      attr(ll, "gradient") = get(paste0(dist, ".grad"))(parms = parms)
+
+    return(-ll)
+  }
+
+  # Univariate zip gradient
+  pois.grad = function(parms,
+                       grad = F) {
+
+    kx = ncol(X)
+    kz = ncol(z)
+
+    ct = head(parms, kx)
+    zi = tail(parms, kz)
+
+    eta.ct = (X %*% ct) + offset.ct
+    eta.zi = (z %*% zi) + offset.zi
+
+    linklist.ct = make.link(link.ct)
+    linklist.zi = make.link(link.zi)
+
+    lam.ct = linklist.ct$linkinv(eta.ct)
+    deta.ct = linklist.ct$mu.eta(eta.ct)
+
+    psi = linklist.zi$linkinv(eta.zi)
+    deta.zi = linklist.zi$mu.eta(eta.zi)
+
+
+    denom.y0 = psi + (1 - psi) * exp(-lam.ct)
+
+    d.zi = ifelse(y == 0,
+                  deta.zi * (1 - exp(-lam.ct)) / denom.y0,
+                  -deta.zi / (1 - psi))
+
+    d.ct = ifelse(y == 0,
+                  -(1 - psi) * exp(-lam.ct) * deta.ct / denom.y0,
+                  deta.ct * (y / lam.ct - 1))
+
+    d.zi = z * d.zi * weights
+    d.ct = X * d.ct * weights
+
+
+    return(-unname(colSums(cbind(d.ct, d.zi))))
+  }
+
+
+  #univariate zinb gradient
+  nbinom.grad = function(parms,
+                         grad = F) {
+    kx = ncol(X)
+    kz = ncol(z)
+    ct = head(parms, kx)
+    zi = parms[(kx + 1):(kx + kz)]
+    theta = exp(tail(parms, 1))
+
+    eta.ct = (X %*% ct) + offset.ct
+    eta.zi = (z %*% zi) + offset.zi
+
+    linklist.ct = make.link(link.ct)
+    linklist.zi = make.link(link.zi)
+
+    lam.ct = linklist.ct$linkinv(eta.ct)
+    deta.ct = linklist.ct$mu.eta(eta.ct)
+
+    psi = linklist.zi$linkinv(eta.zi)
+    deta.zi = linklist.zi$mu.eta(eta.zi)
+
+    denom.y0 = dzinb(y, size = theta, psi = psi, mu = lam.ct) ^ (-1)
+    dnbinom.zi = dnbinom(y, size = theta, mu = lam.ct)
+
+    d.zi = ifelse(y == 0,
+                  denom.y0 * (deta.zi - deta.zi * dnbinom.zi),
+                  -deta.zi / (1 - psi))
+
+    d.ct = ifelse(
+      y == 0,
+      -denom.y0 * deta.ct * (1 - psi) * (theta / (lam.ct + theta)) ^ (theta + 1),
+      deta.ct * theta * (y - lam.ct) / (lam.ct * theta + lam.ct ^ 2)
+    )
+
+    d.th = ifelse(
+      y == 0,
+      denom.y0 * (1 - psi) * (theta / (theta + lam.ct)) ^ theta *
+        (log(theta) - log(lam.ct + theta) + lam.ct / (lam.ct + theta)),
+      digamma(y + theta) - digamma(theta) + 1 + log(theta) -
+        log(theta + lam.ct) - (theta + y) / (theta + lam.ct)
+    )
+
+    d.zi = z * d.zi * weights
+    d.ct = X * d.ct * weights
+    d.th = theta * d.th * weights # multiply by theta due to exponential transform
+
+    return(-unname(colSums(cbind(d.ct, d.zi, d.th))))
+
+  }
+
 
   dist      = match_arg(dist, c("pois", "nbinom"))
   link.ct   = match_arg(link.ct, c("sqrt", "identity", "log"))

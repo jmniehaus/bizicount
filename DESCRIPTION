@@ -15,7 +15,10 @@ Imports:
      Formula,
      rlang,
      MASS,
-     numDeriv
+     numDeriv,
+     methods,
+     stats,
+     utils
 Depends:
      DHARMa,
      texreg

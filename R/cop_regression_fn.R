@@ -1,84 +1,12 @@
 #' @importFrom pbivnorm pbivnorm
 #' @importFrom numDeriv hessian
 #' @importFrom MASS glm.nb
+#' @import stats
+#' @import utils
+#' @import methods
 
-starts.marginal = function() {
-  oldwarn = getOption("warn")
-  options(warn = -1)
-  on.exit(options(warn = oldwarn), add = T)
 
-  if (!env_has(e.check, "univ.check")) {
-    env_poke(e.check, "univ.check", T)
-    on.exit(rm("univ.check", envir = e.check), add = T)
-  }
 
-  starts.ct = starts.zi = starts.disp = list()
-
-  for (i in 1:2) {
-    i = as.numeric(i)
-    mod <- switch(
-      margins[i],
-      "pois"   =
-        glm.fit(
-          X[[i]],
-          y[, i],
-          offset = offset.ct[[i]],
-          family = poisson(link = link.ct[i]),
-          control = list(epsilon = 1e-4),
-          weights = weights
-        ),
-      "nbinom" = suppressWarnings(eval.parent(substitute(
-        MASS::glm.nb(
-          y[, i] ~ X[[i]] + 0 + offset(offset.ct[[i]]),
-          weights = weights,
-          link = link.ct[i]
-          ),
-        list(
-          link.ct = get("link.ct", parent.frame()),
-          i = i
-        )
-      ))),
-      "zinb"   =
-        zic.reg(y=y[,i], X=X[[i]], z=Z[[i]],
-                offset.ct = offset.ct[[i]],
-                offset.zi=offset.zi[[i]],
-          weights = weights,
-          dist = "nbinom",
-          link.zi = link.zi[i],
-          link.ct = link.ct[i],
-          gradtol = 1e-4
-        ),
-      "zip"    =
-        zic.reg(
-          y=y[,i], X=X[[i]], z=Z[[i]],
-          offset.ct = offset.ct[[i]],
-          offset.zi=offset.zi[[i]],
-          dist = "pois",
-          link.zi = link.zi[i],
-          link.ct = link.ct[i],
-          gradtol = 1e-4
-        )
-    )
-
-    if (grepl("nb", margins[i]))
-      starts.disp[[i]] = mod$theta[1]
-
-    coefs = coef(mod)
-
-    starts.ct[[i]] = coefs[1:kx[i]]
-    starts.zi[[i]] = if (any(zipos == i))
-      coefs[(kx[i] + 1):(kx[i] + kz[[i]])]
-    else
-      NULL
-  }
-
-  return(na.omit(c(
-    unlist(starts.ct),
-    unlist(starts.zi),
-    unlist(starts.disp),
-    cor(y, method = "spearman")[1, 2]
-  )))
-}
 
 
 # main copula regression function
@@ -99,6 +27,188 @@ bizicount = function(fmla1,
                     ...) {
   #some arg checking
   check_biv_args()
+
+  # Bivariate likelihood (univariate is lower down)
+  cop.lik = function(parms){
+
+    ct = lapply(ct.ind, function(x) parms[x])
+
+
+    # Loop over inputs to create list of marginal lambdas
+    # ie, lam[1] = f1(x1, z1, w1), lam[2] = f2(x2, z2, w2)
+    lam = mapply(
+      function(par, design, offset, invlink){
+        if(ncol(design) == 1)
+          as.vector(invlink(design * par + offset))
+        else
+          as.vector(invlink(design %*% par + offset))
+      },
+      par = ct,
+      design = X,
+      offset = offset.ct,
+      invlink = invlink.ct,
+      SIMPLIFY = F
+    )
+
+    # Get zi parameters via subset
+    zi = list()
+    if (n.zi == 1)
+      zi[[zipos]] = parms[zi.ind[[zipos]]]
+    if (n.zi == 2){
+      zi = lapply(zi.ind, function(x) parms[x])
+    }
+
+    # dispersion and dependence params
+    disp = list()
+    if (n.nb == 1)
+      disp[[nbpos]] = exp(tail(parms, 2)[1])
+    if (n.nb == 2) {
+      disp[[1]] = exp(tail(parms, 3)[1])
+      disp[[2]] = exp(tail(parms, 2)[1])
+    }
+
+    dep = tail(parms, 1)
+    if (cop == 'gaus')
+      dep = tanh(dep)
+
+    # Create list of zero-inflation probability vectors
+    psi = list()
+    if(n.zi > 0){
+      for(i in zipos)
+        psi[[i]] = as.vector(invlink.zi[[i]](Z[[i]] %*% zi[[i]] + offset.zi[[i]]))
+    }
+
+
+    # get list of arguments to marginal cdfs
+    margin.args = list()
+
+    for (i in c(1, 2)) {
+      margin.args[[i]] = switch(
+        margins[i],
+        "pois" = list(
+          q      = y[, i],
+          lambda = lam[[i]]
+        ),
+        "nbinom"  = list(
+          q     = y[, i],
+          mu    = lam[[i]],
+          size  = disp[[i]]
+        ),
+        "zip" = list(
+          q      = y[, i],
+          lambda = lam[[i]],
+          psi    = psi[[i]]
+        ),
+        "zinb" = list(
+          q     = y[, i],
+          mu    = lam[[i]],
+          size  = disp[[i]],
+          psi   = psi[[i]]
+        )
+      )
+    }
+
+
+
+    # evaluate copula pmf
+    d = cop.pmf(
+      margin.args = margin.args,
+      margins = margins,
+      cop = cop,
+      dep = dep,
+      pmf.min = pmf.min,
+      frech.min = frech.min
+    )
+
+    # bound likelihoods for logging
+    d = bound(d * weights, low = pmf.min)
+
+    #ll
+    -sum(log(d))
+
+  }
+
+  starts.marginal = function() {
+    oldwarn = getOption("warn")
+    options(warn = -1)
+    on.exit(options(warn = oldwarn), add = T)
+
+    if (!env_has(e.check, "univ.check")) {
+      env_poke(e.check, "univ.check", T)
+      on.exit(rm("univ.check", envir = e.check), add = T)
+    }
+
+    starts.ct = starts.zi = starts.disp = list()
+
+    for (i in 1:2) {
+      i = as.numeric(i)
+      mod <- switch(
+        margins[i],
+        "pois"   =
+          glm.fit(
+            X[[i]],
+            y[, i],
+            offset = offset.ct[[i]],
+            family = poisson(link = link.ct[i]),
+            control = list(epsilon = 1e-4),
+            weights = weights
+          ),
+        "nbinom" = suppressWarnings(eval.parent(substitute(
+          MASS::glm.nb(
+            y[, i] ~ X[[i]] + 0 + offset(offset.ct[[i]]),
+            weights = weights,
+            link = link.ct[i]
+          ),
+          list(
+            link.ct = get("link.ct", parent.frame()),
+            i = i
+          )
+        ))),
+        "zinb"   =
+          zic.reg(y=y[,i], X=X[[i]], z=Z[[i]],
+                  offset.ct = offset.ct[[i]],
+                  offset.zi=offset.zi[[i]],
+                  weights = weights,
+                  dist = "nbinom",
+                  link.zi = link.zi[i],
+                  link.ct = link.ct[i],
+                  gradtol = 1e-4
+          ),
+        "zip"    =
+          zic.reg(
+            y=y[,i], X=X[[i]], z=Z[[i]],
+            offset.ct = offset.ct[[i]],
+            offset.zi=offset.zi[[i]],
+            dist = "pois",
+            link.zi = link.zi[i],
+            link.ct = link.ct[i],
+            gradtol = 1e-4
+          )
+      )
+
+      if (grepl("nb", margins[i]))
+        starts.disp[[i]] = mod$theta[1]
+
+      coefs = coef(mod)
+
+      starts.ct[[i]] = coefs[1:kx[i]]
+      starts.zi[[i]] = if (any(zipos == i))
+        coefs[(kx[i] + 1):(kx[i] + kz[[i]])]
+      else
+        NULL
+    }
+
+    return(na.omit(c(
+      unlist(starts.ct),
+      unlist(starts.zi),
+      unlist(starts.disp),
+      cor(y, method = "spearman")[1, 2]
+    )))
+  }
+
+
+
+
 
   cop     = match_arg(cop, c("frank", "gaus"))
   link.ct = match_arg(link.ct, c("sqrt", "identity", "log"), several.ok = T)

@@ -182,3 +182,14 @@ rep_len.custom = function(n, var){
 }
 
 
+# function for setting defaults to each optimizer
+set.defaults = function(de.list, de.names, de.values) {
+     for (i in seq_along(de.names)) {
+          if (is.null(de.list[[de.names[i]]]))
+               de.list[[de.names[i]]] = de.values[i]
+     }
+     return(de.list)
+}
+
+
+
