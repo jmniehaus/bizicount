@@ -87,7 +87,7 @@ gen = function(n,
   dat = data.frame(X1 = X1[,-1], X2 = X2[,-1], Z1=Z1[,-1], Z2=Z2[,-1], y1, y2, lam1, lam2, psi1, psi2)
   return(dat)
 }
-m = zic.reg(f1, data=data, dist="p", keep=T)
+m = zic.reg(f1, data=data, dist="nb", keep=T)
 d = createDHARMa(simulatedResponse= simulate(m),
              observedResponse = data$y1,
              fittedPredictedResponse = fitted(m),
@@ -101,7 +101,7 @@ g2 = c(-1, -3.75, 1.25)
 
 data = gen(1500, b1, b2, g1, g2, .5)
 f1 = y1 ~ X1 | Z1
-f2 = y2 ~ X2.1 + X2.2 | Z2.1 + Z2.2
+f2 = y2 ~ X2 | Z2
 
 y1 = rzinb(500, size=.3, psi=.15, mu=8)
 y2 = rzinb(500, size=.15, psi=.3, mu=12)

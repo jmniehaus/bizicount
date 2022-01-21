@@ -1,3 +1,4 @@
+#' @export
 print.bizicount= function(x){
 
   for(i in 1:2){
@@ -16,16 +17,23 @@ print.bizicount= function(x){
   cat("\n[Use `summary(your.model.object)` function for more details.]\n")
 }
 
+
+#' @export
 logLik.bizicount = function(obj) obj$loglik
 
+#' @export
 AIC.bizicount = function(obj) obj$aic
+
+#' @export
 BIC.bizicount = function(obj) obj$bic
 
+#' @export
 nobs.bizicount = function(obj) obj$nobs
 
+#' @export
 vcov.bizicount = function(obj) obj$covmat
 
-
+#' @export
 coef.bizicount = function(x, id=T){
   if(id)
     return(x$coef)
@@ -33,12 +41,13 @@ coef.bizicount = function(x, id=T){
     return(x$coef.nid)
 }
 
+#' @export
 fitted.bizicount = function(x){
 
   with(x, {
 
   if(is.null(x$model))
-    stop("bizicount() model must be fit with `keep=TRUE` to get fitted values.")
+    stop("bizicount() model must be fit with `keep=TRUE` to get fitted values.", call.=F)
 
   n.zi = sum(grepl("zi", margins))
   X = model[["X"]]
@@ -71,6 +80,7 @@ fitted.bizicount = function(x){
   })
 }
 
+#' @export
 summary.bizicount = function(x){
   if(!any(class(x)=="bizicount"))
     stop("Object must be of class `bizicount`.")
@@ -79,6 +89,7 @@ summary.bizicount = function(x){
   return(x)
 }
 
+#' @export
 print.summary.bizicount = function(x, stars=T){
   old = getOption("show.signif.stars")
   options(show.signif.stars = stars)
@@ -151,19 +162,9 @@ print.summary.bizicount = function(x, stars=T){
 
 }
 
-divider = function(symbol, width, prepend=F, append=F){
-  if(prepend) cat("\n")
-  cat(paste0(rep(symbol, width), collapse=""), "\n")
-  if(append) cat("\n")
-}
-
-modlabel = function(name, pad=2, ...){
-  cat(paste(name, "|"), "\n")
-  divider("-", (nchar(name) + pad), ...)
-}
-
 
 # Function for getting texreg output from bizicount objects.
+#' @export
 extract.bizicount = function(model, CI=NULL, id=T){
   if(!is.null(CI) && (CI > 1 || CI < 0) ) stop("`CI` must be between 0 and 1. ")
   if(!is.logical(id)) stop("`id` must be logical (T/F) value.")
@@ -267,6 +268,7 @@ setMethod("extract",
           signature = "bizicount",
           definition= extract.bizicount)
 
+#' @export
 simulate.bizicount = function(mod, n=250, seed=123){
   if(is.null(mod$model))
     stop("Must set `keep=T` in bizicount() to do diagnostics on model object.")
@@ -347,6 +349,7 @@ simulate.bizicount = function(mod, n=250, seed=123){
 
 }
 
+#' @export
 make.DHARMa = function(model, n=250, seed=123, method="PIT"){
   if( !any(class(model) == "bizicount") )
     stop("Function must be applied to bizicount class object.")
