@@ -1,15 +1,71 @@
+# main copula regression function
+
+
+#' @title Maximum likelihood estimation of copula-based bivariate zero-inflated
+#'   (and non-inflated) count models
+#'
+#' @description The main bivariate regression function of the 'bizicount'
+#'   package. Estimates copula-based bivariate zero-inflated (and non-inflated)
+#'   count models via maximum likelihood. Supports the Frank and Gaussian
+#'   copulas, zero-inflated Poisson and negative binomial margins (and their
+#'   non-inflated counterparts).
+#'
+#' @details These are details.
+#'
+#' @name bizicount
+#'
+#' @param fmla1 A `formula` for the first margin. If non-inflated, of the form
+#'   `y ~ x1 + x2`; if inflated, of the form `y ~ x1 + x2 | z1 + z2`, where `y`
+#'   is the outcome for the first margin, `x` are covariates for count
+#'   parameters, and `z` are covariates for zero-inflated parameters.
+#' @param fmla2 A `formula` for the second margin. See `fmla1`.
+#' @param data A dataframe containing the response variables, covariates, and
+#'   offsets for the model. If `NULL`, these quantities are searched for in the
+#'   parent environment.
+#' @param cop Character string specifying the copula to be used. One of `"gaus"`
+#'   or `"frank."` Partial matching supported.
+#' @param margins Length 2 character vector specifying the marginal
+#'   distributions for each outcome. Each of the two elements must be one of
+#'   `c("pois", "nbinom", "zip", "zinb")`, and must be consistent with its
+#'   corresponding formula (i.e., zero-inflated margins with zero-inflated
+#'   formulas).
+#' @param link.ct Length 2 character string specifying the link function used
+#'   for the count portion of each margin (if zero-inflated, otherwise it is the
+#'   link function for the conditional mean). One of `c("log", "identity",
+#'   "sqrt")`.
+#' @param link.zi Length 2 character string specifying the link function used
+#'   for the zero-inflation portion of each margin. One of `c("logit", "probit",
+#'   "cauchit", "log", "cloglog")`. Ignored if corresponding `margins` entry is
+#'   not zero-inflated.
+#' @param starts Numeric vector of starting values for parameter estimates. See
+#'   details on the correct order for the values in this vector. If `NULL`,
+#'   starting values are obtained automatically by a univariate regression fit.
+#' @param keep Logical indicating whether to keep the model matrix in the
+#'   returned model object. Defaults to `FALSE` to conserve memory. NOTE: This
+#'   must be set to `TRUE` to use \code{\link[texreg]{texreg}} or \code{\link{make.DHARMa}} functions with
+#'   `bizicount` objects.
+#' @param subset an optional vector specifying a subset of observations to be
+#'   used in the fitting process.
+#' @param na.action a function which indicates what should happen when the data
+#'   contain NAs. The default is set by the na.action setting of options, and is
+#'   na.fail if that is unset. The ‘factory-fresh’ default is na.omit. Another
+#'   possible value is NULL, no action. Value na.exclude can be useful.
+#' @param weights An optional numeric vector of weights for each observation.
+#' @param frech.min Lower boundary for Frechet-Hoeffding bounds on copula CDF.
+#'   Used for computational purposes to prevent over/underflow in likelihood
+#'   search. See details.
+#' @param pmf.min Lower boundary on copula PMF evaluations. Used for
+#'   computational purposes to prevent over/underflow in likelihood search. See
+#'   details.
+#' @param ... Additional arguments to be passed on to the quasi-newton fitting
+#'   function, \code{\link[stats]{nlm}}
 #' @importFrom pbivnorm pbivnorm
 #' @importFrom numDeriv hessian
 #' @importFrom MASS glm.nb
 #' @import stats
 #' @import utils
 #' @import methods
-
-
-
-
-
-# main copula regression function
+#' @export
 bizicount = function(fmla1,
                     fmla2,
                     data,
