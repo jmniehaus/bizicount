@@ -1,4 +1,5 @@
 # zi poisson pmf ===============================================================
+#' @export
 dzip = function(x, lambda, psi, log=F, recycle=F){
 
   if(!env_has(e.check, "zi.dens.checks"))
@@ -44,6 +45,7 @@ dzip = function(x, lambda, psi, log=F, recycle=F){
 
 
 # zi poisson cdf ===============================================================
+#' @export
 pzip = function(q, lambda, psi, lower.tail=T, log.p=F, recycle=F){
 
   if(!env_has(e.check, "zi.dens.checks")){
@@ -82,6 +84,7 @@ pzip = function(q, lambda, psi, lower.tail=T, log.p=F, recycle=F){
 
 
 # zi poisson quantile =========================================================
+#' @export
 qzip = function(p, lambda, psi, lower.tail=T, log.p=F, recycle=F){
 
   if(!env_has(e.check, "zi.dens.checks")){
@@ -126,6 +129,7 @@ qzip = function(p, lambda, psi, lower.tail=T, log.p=F, recycle=F){
 
 
 # zi poisson rng ===============================================================
+#' @export
 rzip = function(n, lambda, psi, recycle=F){
 
   check_dist_args(recycle=recycle)
@@ -156,6 +160,7 @@ rzip = function(n, lambda, psi, recycle=F){
 ### PMF, CDF, Quantile, Random generation for zero inflated negbin
 
 # zi nbin pmf =================================================================
+#' @export
 dzinb = function(x, size, psi,  prob=NULL, mu=NULL, log=F, recycle=F){
 
   if(!env_has(e.check, "zi.dens.checks")){
@@ -208,6 +213,7 @@ dzinb = function(x, size, psi,  prob=NULL, mu=NULL, log=F, recycle=F){
 
 
 # zi nbin cdf =================================================================
+#' @export
 pzinb = function(q, size, psi, prob=NULL, mu=NULL,  lower.tail=T, log.p=F, recycle=F){
 
   if(!env_has(e.check, "zi.dens.checks")){
@@ -254,6 +260,7 @@ pzinb = function(q, size, psi, prob=NULL, mu=NULL,  lower.tail=T, log.p=F, recyc
 
 
 # zi nbin quantile =============================================================
+#' @export
 qzinb = function(p, size, psi, prob=NULL, mu=NULL, lower.tail=T, log.p=F, recycle=F){
 
   if(!env_has(e.check, "zi.dens.checks")){
@@ -302,6 +309,7 @@ qzinb = function(p, size, psi, prob=NULL, mu=NULL, lower.tail=T, log.p=F, recycl
 
 
 # zi nbin rng =================================================================
+#' @export
 rzinb = function(n, size, psi, mu=NULL, prob=NULL, recycle=F){
 
   check_dist_args(negbin=T, recycle=recycle)

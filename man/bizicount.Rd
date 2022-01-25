@@ -2,7 +2,7 @@
 % Please edit documentation in R/cop_regression_fn.R
 \name{bizicount}
 \alias{bizicount}
-\title{Maximum likelihood estimation of copula-based bivariate zero-inflated
+\title{Bizicount: Maximum likelihood estimation of copula-based bivariate zero-inflated
 (and non-inflated) count models}
 \usage{
 bizicount(
@@ -35,8 +35,7 @@ parameters, and \code{z} are covariates for zero-inflated parameters.}
 offsets for the model. If \code{NULL}, these quantities are searched for in the
 parent environment.}
 
-\item{cop}{Character string specifying the copula to be used. One of \code{"gaus"}
-or \code{"frank."} Partial matching supported.}
+\item{cop}{Character string specifying the copula to be used. One of \code{c("gaus", "frank")}. Partial matching supported.}
 
 \item{margins}{Length 2 character vector specifying the marginal
 distributions for each outcome. Each of the two elements must be one of
@@ -53,8 +52,8 @@ for the zero-inflation portion of each margin. One of \code{c("logit", "probit",
 not zero-inflated.}
 
 \item{starts}{Numeric vector of starting values for parameter estimates. See
-details on the correct order for the values in this vector. If \code{NULL},
-starting values are obtained automatically by a univariate regression fit.}
+'Details' section regarding the correct order for the values in this vector.
+If \code{NULL}, starting values are obtained automatically by a univariate regression fit.}
 
 \item{keep}{Logical indicating whether to keep the model matrix in the
 returned model object. Defaults to \code{FALSE} to conserve memory. NOTE: This
@@ -73,22 +72,132 @@ possible value is NULL, no action. Value na.exclude can be useful.}
 
 \item{frech.min}{Lower boundary for Frechet-Hoeffding bounds on copula CDF.
 Used for computational purposes to prevent over/underflow in likelihood
-search. See details.}
+search. See 'Details.'}
 
 \item{pmf.min}{Lower boundary on copula PMF evaluations. Used for
 computational purposes to prevent over/underflow in likelihood search. See
-details.}
+'Details.'}
 
 \item{...}{Additional arguments to be passed on to the quasi-newton fitting
-function, \code{\link[stats]{nlm}}}
+function, \code{\link[stats]{nlm}}.}
+}
+\value{
+An S3 object (and list) of class '\code{bizicount}'.
 }
 \description{
-The main bivariate regression function of the 'bizicount'
+The main bivariate regression function of the '\code{bizicount}'
 package. Estimates copula-based bivariate zero-inflated (and non-inflated)
 count models via maximum likelihood. Supports the Frank and Gaussian
-copulas, zero-inflated Poisson and negative binomial margins (and their
-non-inflated counterparts).
+copulas, as well as zero-inflated Poisson and negative binomial margins (and their
+non-inflated counterparts). Has methods for outputting professional tables using
+the \code{\link[texreg]{texreg}} package, and for post-estimation diagnostics with
+\code{\link[DHARMa]{DHARMa}}. See the 'See Also' section for links to these methods.
 }
 \details{
-These are details.
+\itemize{
+\item \code{starts} -- Starting values should be organized as
+follows:
+\enumerate{
+\item count parameters for margin 1
+\item count parameters for margin 2
+\item zero-inflated parameters for margin 1 (if applicable),
+\item zero-inflated parameters for margin 2 (if applicable),
+\item inverse dispersion parameter for margin 1 (if applicable),
+\item inverse dispersion parameter for margin 2 (if applicable)
+}
+Thus, in general count parameters should come first, followed by
+zero-inflation parameters, and finally inverse dispersion parameters.
+
+\item \code{frech.min} --Frechet (1951) and Hoeffding (1940) showed that
+copula CDFs have bounds of the form \eqn{max{u + v - 1, 0} \le C(u, v) \le
+min{u, v}}, where \eqn{u} and \eqn{v} are uniform realizations derived from
+the probability integral transform. Due to numerical underflow, very small
+values of \eqn{u} and \eqn{v} can be rounded to zero. Particularly when
+evaluating the Gaussian copula CDF this is problematic, ultimately leading to
+infinite-valued likelihood evaluations. Therefore, we impose
+Frechet-Hoeffding bounds numerically as \eqn{max{u + v - 1, frech.min} \le
+C(u, v) \le min{u, v, 1 - frech.min}}.
+
+\item \code{pmf.min} -- Changing this argument should almost never be
+necessary. Observations can have likelihoods that are extremely close to 0.
+Numerically, these get rounded to 0 due to underflow. Then, taking logarithms
+results in an infinite likelihood. To avoid this, we bound PMF evaluations
+from below at \code{pmf.min}.
+
+}
+}
+\examples{
+# bizicount example
+set.seed(123)
+n = 500
+
+# define a function to simulate from a gaussian copula
+# first margin is zero-inflated negative binomial (zinb)
+# second margin is zero-inflated poisson (zip)
+# Note: marginal distributions are hard-coded in function, including
+# inverse dispersion parameter for zinb.
+gen = function(n,
+               b1,
+               b2,
+               g1,
+               g2,
+               dep) {
+
+     k1 = length(b1)
+     k2 = length(b2)
+
+     X1 = cbind(1, matrix(rbinom(n * (k1 - 1), 1, .5), ncol = k1 - 1))
+     X2 = cbind(1, matrix(rexp(n * (k2 - 1), 3), ncol = k2 - 1))
+
+     lam1 = exp(X1 \%*\% b1)
+     lam2 = exp(X2 \%*\% b2)
+
+     Z1 = cbind(1, matrix(runif(n * (k1 - 1), -1, 1), ncol = k1 - 1))
+     Z2 = cbind(1, matrix(rnorm(n * (k2 - 1)), ncol = k2 - 1))
+
+     psi1 = plogis(Z1 \%*\% g1)
+     psi2 = plogis(Z2 \%*\% g2)
+
+     norm_vars = MASS::mvrnorm(
+          n,
+          mu = c(0, 0),
+          Sigma = matrix(c(1, dep, dep, 1), ncol =2)
+          )
+
+     U = pnorm(norm_vars)
+
+     y1 =  qzinb(U[, 1],
+                 mu = lam1,
+                 psi = psi1,
+                 size = .3)
+     y2 =  qzip(U[, 2],
+                lambda = lam2,
+                psi = psi2)
+
+     dat = data.frame(
+          X1 = X1[, -1],
+          X2 = X2[, -1],
+          Z1 = Z1[, -1],
+          Z2 = Z2[, -1],
+          y1,
+          y2,
+          lam1,
+          lam2,
+          psi1,
+          psi2
+     )
+     return(dat)
+}
+
+b1 = c(1, -2, 3)
+b2 = c(-1, 3, 1)
+g1 = c(2, -1.5, 2)
+g2 = c(-1, -3.75, 1.25)
+rho = .5
+
+dat = gen(n, b1, b2, g1, g2, rho)
+f1 = y1 ~ X1.1 + X1.2 | Z1.1 + Z1.2
+f2 = y2 ~ X2.1 + X2.2 | Z2.1 + Z2.2
+
+bizicount(f1, f2, dat, cop = "g", margins = c("zinb", "zip"))
 }

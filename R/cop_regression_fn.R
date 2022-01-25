@@ -1,16 +1,53 @@
 # main copula regression function
 
 
-#' @title Maximum likelihood estimation of copula-based bivariate zero-inflated
+#' @title Bizicount: Maximum likelihood estimation of copula-based bivariate zero-inflated
 #'   (and non-inflated) count models
 #'
-#' @description The main bivariate regression function of the 'bizicount'
+#' @description The main bivariate regression function of the '\code{bizicount}'
 #'   package. Estimates copula-based bivariate zero-inflated (and non-inflated)
 #'   count models via maximum likelihood. Supports the Frank and Gaussian
-#'   copulas, zero-inflated Poisson and negative binomial margins (and their
-#'   non-inflated counterparts).
+#'   copulas, as well as zero-inflated Poisson and negative binomial margins (and their
+#'   non-inflated counterparts). Has methods for outputting professional tables using
+#'   the \code{\link[texreg]{texreg}} package, and for post-estimation diagnostics with
+#'   \code{\link[DHARMa]{DHARMa}}. See the 'See Also' section for links to these methods.
 #'
-#' @details These are details.
+#' @details
+#' \itemize{
+#'  \item \code{starts} -- Starting values should be organized as
+#'  follows:
+#'    \enumerate{
+#'      \item count parameters for margin 1
+#'      \item count parameters for margin 2
+#'      \item zero-inflated parameters for margin 1 (if applicable),
+#'      \item zero-inflated parameters for margin 2 (if applicable),
+#'      \item inverse dispersion parameter for margin 1 (if applicable),
+#'      \item inverse dispersion parameter for margin 2 (if applicable)
+#'    }
+#'  Thus, in general count parameters should come first, followed by
+#'  zero-inflation parameters, and finally inverse dispersion parameters.
+#'
+#' \item \code{frech.min} --Frechet (1951) and Hoeffding (1940) showed that
+#' copula CDFs have bounds of the form \eqn{max{u + v - 1, 0} \le C(u, v) \le
+#' min{u, v}}, where \eqn{u} and \eqn{v} are uniform realizations derived from
+#' the probability integral transform. Due to numerical underflow, very small
+#' values of \eqn{u} and \eqn{v} can be rounded to zero. Particularly when
+#' evaluating the Gaussian copula CDF this is problematic, ultimately leading to
+#' infinite-valued likelihood evaluations. Therefore, we impose
+#' Frechet-Hoeffding bounds numerically as \eqn{max{u + v - 1, frech.min} \le
+#' C(u, v) \le min{u, v, 1 - frech.min}}.
+#'
+#' \item \code{pmf.min} -- Changing this argument should almost never be
+#' necessary. Observations can have likelihoods that are extremely close to 0.
+#' Numerically, these get rounded to 0 due to underflow. Then, taking logarithms
+#' results in an infinite likelihood. To avoid this, we bound PMF evaluations
+#' from below at \code{pmf.min}.
+#'
+#' }
+#'
+#' @example inst/examples/bizicount_ex.R
+#'
+#' @return An S3 object (and list) of class '\code{bizicount}'.
 #'
 #' @name bizicount
 #'
@@ -22,8 +59,7 @@
 #' @param data A dataframe containing the response variables, covariates, and
 #'   offsets for the model. If `NULL`, these quantities are searched for in the
 #'   parent environment.
-#' @param cop Character string specifying the copula to be used. One of `"gaus"`
-#'   or `"frank."` Partial matching supported.
+#' @param cop Character string specifying the copula to be used. One of `c("gaus", "frank")`. Partial matching supported.
 #' @param margins Length 2 character vector specifying the marginal
 #'   distributions for each outcome. Each of the two elements must be one of
 #'   `c("pois", "nbinom", "zip", "zinb")`, and must be consistent with its
@@ -38,8 +74,8 @@
 #'   "cauchit", "log", "cloglog")`. Ignored if corresponding `margins` entry is
 #'   not zero-inflated.
 #' @param starts Numeric vector of starting values for parameter estimates. See
-#'   details on the correct order for the values in this vector. If `NULL`,
-#'   starting values are obtained automatically by a univariate regression fit.
+#'   'Details' section regarding the correct order for the values in this vector.
+#'   If `NULL`, starting values are obtained automatically by a univariate regression fit.
 #' @param keep Logical indicating whether to keep the model matrix in the
 #'   returned model object. Defaults to `FALSE` to conserve memory. NOTE: This
 #'   must be set to `TRUE` to use \code{\link[texreg]{texreg}} or \code{\link{make.DHARMa}} functions with
@@ -53,18 +89,21 @@
 #' @param weights An optional numeric vector of weights for each observation.
 #' @param frech.min Lower boundary for Frechet-Hoeffding bounds on copula CDF.
 #'   Used for computational purposes to prevent over/underflow in likelihood
-#'   search. See details.
+#'   search. See 'Details.'
 #' @param pmf.min Lower boundary on copula PMF evaluations. Used for
 #'   computational purposes to prevent over/underflow in likelihood search. See
-#'   details.
+#'   'Details.'
 #' @param ... Additional arguments to be passed on to the quasi-newton fitting
-#'   function, \code{\link[stats]{nlm}}
+#'   function, \code{\link[stats]{nlm}}.
 #' @importFrom pbivnorm pbivnorm
 #' @importFrom numDeriv hessian
 #' @importFrom MASS glm.nb
 #' @import stats
 #' @import utils
 #' @import methods
+#' @importFrom rlang env_has
+#' @importFrom rlang env_poke
+#' @import Formula
 #' @export
 bizicount = function(fmla1,
                     fmla2,
