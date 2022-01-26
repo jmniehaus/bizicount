@@ -57,7 +57,7 @@ If \code{NULL}, starting values are obtained automatically by a univariate regre
 
 \item{keep}{Logical indicating whether to keep the model matrix in the
 returned model object. Defaults to \code{FALSE} to conserve memory. NOTE: This
-must be set to \code{TRUE} to use \code{\link[texreg]{texreg}} or \code{\link{make.DHARMa}} functions with
+must be set to \code{TRUE} to use \code{\link[texreg]{texreg}} or \code{\link{make_DHARMa}} functions with
 \code{bizicount} objects.}
 
 \item{subset}{an optional vector specifying a subset of observations to be
@@ -200,4 +200,7 @@ f1 = y1 ~ X1.1 + X1.2 | Z1.1 + Z1.2
 f2 = y2 ~ X2.1 + X2.2 | Z2.1 + Z2.2
 
 bizicount(f1, f2, dat, cop = "g", margins = c("zinb", "zip"))
+}
+\author{
+John Niehaus
 }

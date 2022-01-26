@@ -1,6 +1,6 @@
 # main copula regression function
 
-
+#' @name bizicount
 #' @title Bizicount: Maximum likelihood estimation of copula-based bivariate zero-inflated
 #'   (and non-inflated) count models
 #'
@@ -49,7 +49,7 @@
 #'
 #' @return An S3 object (and list) of class '\code{bizicount}'.
 #'
-#' @name bizicount
+#'
 #'
 #' @param fmla1 A `formula` for the first margin. If non-inflated, of the form
 #'   `y ~ x1 + x2`; if inflated, of the form `y ~ x1 + x2 | z1 + z2`, where `y`
@@ -78,7 +78,7 @@
 #'   If `NULL`, starting values are obtained automatically by a univariate regression fit.
 #' @param keep Logical indicating whether to keep the model matrix in the
 #'   returned model object. Defaults to `FALSE` to conserve memory. NOTE: This
-#'   must be set to `TRUE` to use \code{\link[texreg]{texreg}} or \code{\link{make.DHARMa}} functions with
+#'   must be set to `TRUE` to use \code{\link[texreg]{texreg}} or \code{\link{make_DHARMa}} functions with
 #'   `bizicount` objects.
 #' @param subset an optional vector specifying a subset of observations to be
 #'   used in the fitting process.
@@ -95,6 +95,8 @@
 #'   'Details.'
 #' @param ... Additional arguments to be passed on to the quasi-newton fitting
 #'   function, \code{\link[stats]{nlm}}.
+#'
+#' @author John Niehaus
 #' @importFrom pbivnorm pbivnorm
 #' @importFrom numDeriv hessian
 #' @importFrom MASS glm.nb
@@ -104,6 +106,8 @@
 #' @importFrom rlang env_has
 #' @importFrom rlang env_poke
 #' @import Formula
+#'
+#'
 #' @export
 bizicount = function(fmla1,
                     fmla2,

@@ -1,4 +1,59 @@
 # zi poisson pmf ===============================================================
+
+#' @name dzip
+#' @title The zero-inflated Poisson (ZIP) distribution
+#'
+#' @description These functions are used to evaluate the zero-inflated Poisson
+#'   distribution's probability mass function (PMF), cumulative distribution
+#'   function (CDF), and quantile function (inverse CDF), as well as generate
+#'   random realizations from the ZIP distribution.
+#'
+#' @details The zero inflated Poisson distribution is a mixture of a Poisson
+#'    and a degenerate point-mass at 0. It has the form
+#'    \deqn{\psi + (1-\psi)(\lambda^x e^-\lambda)/x!}, with mean
+#'    \eqn{(1-\psi)\lambda}. Thus, the parameter `lambda` above is the mean of
+#'    the Poisson distribution that forms part of the zero-inflated
+#'    distribution, *not* the mean of the ZIP distribution.
+#'
+#'    `recycle` -- If `FALSE` (default), all arguments must have identical
+#'    length, there can be two unique lengths for the arguments, provided that
+#'    one of those lengths is 1. For example, `lambda = c(1,2,3)` and `psi=.5`
+#'    is acceptable because there are two unique lengths, and one of them is
+#'    length 1. However, `lambda=c(1,2,3)` and `psi=c(.5,.2)` would fail, as
+#'    there are two distinct lengths, none of which is 1. If `TRUE,` no
+#'    additional checks (beyond those in base R's functions) are made to ensure
+#'    that the argument vectors have the same length.
+#'
+#' @param x,q Vector of quantiles at which to evaluate the PMF and CDF,
+#'  respectively. Should be non-negative integers.
+#'
+#' @param p Vector of probabilities at which to evaluate the quantile function.
+#'
+#' @param n Number of realizations from the distribution to generate
+#'
+#' @param lambda Vector of means for the count portion of the zero-inflated
+#'    Poisson distribution. Should be non-negative. NOTE: This is *not* the mean
+#'    of the zero-inflated Poisson distribution; it is the mean of the Poisson
+#'    component of the mixture distribution. See 'Details.'
+#'
+#' @param psi Vector of zero-inflation probabilities.
+#'
+#' @param log,log.p Logical indicating whether probabilities should be returned
+#'  on log scale (for `dzip` and `pzip`), or are supplied on log-scale (for `qzip`).
+#'
+#' @param lower.tail Logical indicating whether probabilities should be
+#'    \eqn{Pr(X \le x)} or \eqn{Pr(X > x)}
+#'
+#' @param recycle Logical indicating whether to permit arbitrary recycling of
+#'    arguments with unequal length. See 'Details.'
+#'
+#' @return `dzip` returns the mass function evaluated at `x`,
+#'    `pzip` returns the CDF evaluated at `q`, `qzip` returns the quantile
+#'    function evaluated at `p`, and `rzip` returns random variates with the
+#'    specified parameters.
+#'
+#' @author John Niehaus
+
 #' @export
 dzip = function(x, lambda, psi, log=F, recycle=F){
 
@@ -43,8 +98,37 @@ dzip = function(x, lambda, psi, log=F, recycle=F){
 
 }
 
+# zi poisson rng ===============================================================
+#' @rdname dzip
+#' @export
+rzip = function(n, lambda, psi, recycle=F){
+
+  check_dist_args(recycle=recycle)
+
+  call = match.call()
+
+  if((length(lambda)==1 && lambda < 0) ||
+     (length(psi) ==1 && (psi < 0 || psi > 1))){
+    warning("NaNs produced; perhaps `lambda` negative, or `psi` not on unit-interval?")
+    return(rep(NaN, n))
+  }
+
+  new.args = lapply(list(psi=psi, lambda=lambda), rep_len.custom, n=n)
+  list2env(new.args, envir=environment())
+
+  x = alter.cond(
+    ifelse(rbinom(n,1,psi) == 1, 0, rpois(n, lambda=lambda))
+  )
+
+  x[psi <0 | psi> 1 | lambda < 0] = NaN
+
+  return(x)
+}
+
+
 
 # zi poisson cdf ===============================================================
+#' @rdname dzip
 #' @export
 pzip = function(q, lambda, psi, lower.tail=T, log.p=F, recycle=F){
 
@@ -84,6 +168,7 @@ pzip = function(q, lambda, psi, lower.tail=T, log.p=F, recycle=F){
 
 
 # zi poisson quantile =========================================================
+#' @rdname dzip
 #' @export
 qzip = function(p, lambda, psi, lower.tail=T, log.p=F, recycle=F){
 
@@ -125,35 +210,6 @@ qzip = function(p, lambda, psi, lower.tail=T, log.p=F, recycle=F){
 
   return(quant)
 }
-
-
-
-# zi poisson rng ===============================================================
-#' @export
-rzip = function(n, lambda, psi, recycle=F){
-
-  check_dist_args(recycle=recycle)
-
-  call = match.call()
-
-  if((length(lambda)==1 && lambda < 0) ||
-     (length(psi) ==1 && (psi < 0 || psi > 1))){
-    warning("NaNs produced; perhaps `lambda` negative, or `psi` not on unit-interval?")
-    return(rep(NaN, n))
-  }
-
-  new.args = lapply(list(psi=psi, lambda=lambda), rep_len.custom, n=n)
-  list2env(new.args, envir=environment())
-
-  x = alter.cond(
-    ifelse(rbinom(n,1,psi) == 1, 0, rpois(n, lambda=lambda))
-  )
-
-  x[psi <0 | psi> 1 | lambda < 0] = NaN
-
-  return(x)
-}
-
 
 
 

@@ -357,7 +357,7 @@ simulate.bizicount = function(object, nsim=250, seed=123, ...){
 }
 
 #' @export
-make.DHARMa = function(object, nsim=250, seed=123, method="PIT"){
+make_DHARMa = function(object, nsim=250, seed=123, method="PIT"){
   if( !any(class(object) == "bizicount") )
     stop("Function must be applied to bizicount class object.")
 
