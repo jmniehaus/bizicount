@@ -30,7 +30,7 @@ component of the mixture distribution. See 'Details.'}
 on log scale (for \code{dzip} and \code{pzip}), or are supplied on log-scale (for \code{qzip}).}
 
 \item{recycle}{Logical indicating whether to permit arbitrary recycling of
-arguments with unequal length. See 'Details.'}
+arguments with unequal length. See 'Details' and 'Examples.'}
 
 \item{n}{Number of realizations from the distribution to generate}
 
@@ -67,6 +67,38 @@ length 1. However, \code{lambda=c(1,2,3)} and \code{psi=c(.5,.2)} would fail, as
 there are two distinct lengths, none of which is 1. If \verb{TRUE,} no
 additional checks (beyond those in base R's functions) are made to ensure
 that the argument vectors have the same length.
+}
+\examples{
+# Unequal lengths, but one of them is length 1, others are same length (3).
+# No error.
+
+x = c(1,2,3)
+lambda = c(3,4,5)
+psi = .1
+
+dzip(x, lambda, psi)
+
+
+#unequal lengths, at least one of them is not length 1, so error.
+
+\dontrun{
+
+x = c(1,2,3)
+lambda = c(3,4)
+psi = .1
+
+dzip(x, lambda, psi)
+
+}
+
+# unequal lengths, at least one of them is not length 1.
+# but set recycle = T to permit arbitrary recycling.
+
+x = c(1,2,3)
+lambda = c(3,4)
+psi = .1
+
+dzip(x, lambda, psi, recycle=T)
 }
 \author{
 John Niehaus

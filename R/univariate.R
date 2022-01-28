@@ -3,6 +3,7 @@
 #' @import Formula
 
 #univariate regression function
+#' @export
 zic.reg = function(fmla = NULL,
                    data,
                    subset,

@@ -35,7 +35,8 @@
 #' evaluating the Gaussian copula CDF this is problematic, ultimately leading to
 #' infinite-valued likelihood evaluations. Therefore, we impose
 #' Frechet-Hoeffding bounds numerically as \eqn{max{u + v - 1, frech.min} \le
-#' C(u, v) \le min{u, v, 1 - frech.min}}.
+#' C(u, v) \le min{u, v, 1 - frech.min}}. NOTE: Setting this to 0 imposes the
+#' original Frechet bounds mentioned above.
 #'
 #' \item \code{pmf.min} -- Changing this argument should almost never be
 #' necessary. Observations can have likelihoods that are extremely close to 0.
@@ -89,12 +90,14 @@
 #' @param weights An optional numeric vector of weights for each observation.
 #' @param frech.min Lower boundary for Frechet-Hoeffding bounds on copula CDF.
 #'   Used for computational purposes to prevent over/underflow in likelihood
-#'   search. See 'Details.'
-#' @param pmf.min Lower boundary on copula PMF evaluations. Used for
-#'   computational purposes to prevent over/underflow in likelihood search. See
+#'   search. Must be in \eqn{[0, 1e-5]}, with \eqn{0} imposing no bound. See
 #'   'Details.'
+#' @param pmf.min Lower boundary on copula PMF evaluations. Used for
+#'   computational purposes to prevent over/underflow in likelihood search. Must
+#'   be in \eqn{[0, 1e-5]}, with \eqn{0} imposing no bound. See Details.'
 #' @param ... Additional arguments to be passed on to the quasi-newton fitting
-#'   function, \code{\link[stats]{nlm}}.
+#'   function, \code{\link[stats]{nlm}}. See 'Details' for some parameters that
+#'   may be useful to alter.
 #'
 #' @author John Niehaus
 #' @importFrom pbivnorm pbivnorm

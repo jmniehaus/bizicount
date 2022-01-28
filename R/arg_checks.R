@@ -50,14 +50,14 @@ check_biv_args = function(pos = 1) {
     )
 
     assert(
-      frech.min <= 1e-5 & frech.min > 0,
-      "Frechtet lower bound must be in (0, .00001].",
+      frech.min <= 1e-5 & frech.min >= 0,
+      "Frechtet lower bound must be in [0, .00001].",
       pos = -6
     )
 
     assert(
-      pmf.min <= 1e-5 & pmf.min > 0,
-      "Frechtet lower bound must be in (0, .00001].",
+      pmf.min <= 1e-5 & pmf.min >= 0,
+      "PMF lower bound must be in [0, .00001].",
       pos = -6
     )
 
@@ -96,7 +96,6 @@ check_dist_args = function(pos = 1,
                            negbin = F,
                            recycle = F) {
   arglist = as.list(parent.frame(pos))
-
 
   on.exit(rm(arglist), add = T)
 
@@ -145,8 +144,11 @@ check_dist_args = function(pos = 1,
   if (!recycle) {
     assert(
       arglist.u == 1 || (arglist.u == 2 && any(arglist.l == 1)),
-      "Argument lengths imply ambiguous recycling. Ensure that all args are of same length, or that all lengths greater than one are equal."
+      "Argument lengths imply ambiguous recycling. Ensure that all args are of
+      same length, or that all lengths greater than one are equal."
     )
+  } else {
+    warning("`recycle=T` may give inaccurate results.")
   }
 
   return(invisible(NULL))

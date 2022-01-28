@@ -45,12 +45,14 @@
 #'    \eqn{Pr(X \le x)} or \eqn{Pr(X > x)}
 #'
 #' @param recycle Logical indicating whether to permit arbitrary recycling of
-#'    arguments with unequal length. See 'Details.'
+#'    arguments with unequal length. See 'Details' and 'Examples.'
 #'
 #' @return `dzip` returns the mass function evaluated at `x`,
 #'    `pzip` returns the CDF evaluated at `q`, `qzip` returns the quantile
 #'    function evaluated at `p`, and `rzip` returns random variates with the
 #'    specified parameters.
+#'
+#' @example inst/examples/uni_dist_ex.R
 #'
 #' @author John Niehaus
 
