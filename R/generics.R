@@ -464,6 +464,9 @@ vcov.zicreg = function(object, ...)
   object$covmat
 
 #' @export
+#' @name simulate.zicreg
+#' @title This is a title
+#' @description This is a description
 simulate.zicreg = function(object, nsim = 250, seed=123, ...) {
   if (is.null(object$model))
     stop("Must set `keep=T` in zic.reg() to do diagnostics on model object.")
@@ -639,6 +642,9 @@ predict.zicreg = function(object,
 }
 
 # Function for texregging output
+#' @name extract.zicreg
+#' @title This is a title
+#' @description This is a description
 #' @export
 extract.zicreg = function(model, CI = NULL, id = T) {
   if (!is.null(CI) &&

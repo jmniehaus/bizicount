@@ -4,8 +4,85 @@
 
 #univariate regression function
 #' @export
+#' @name zic.reg
+#' @title Univariate zero-inflated Poisson and negative binomial regression models
+#'
+#' @description This function from the \code{\link{bizicount}} package estimates
+#'   univariate zero-inflated Poisson and negative binomial regression models
+#'   via maximum likelihood using either the \code{\link[stats]{nlm}} or
+#'   \code{\link[stats]{optim}} optimization functions.  It's class has
+#'   associated \code{\link[stats]{simulate}} methods for post-estimation
+#'   diagnostics using the \code{\link[=DHARMa]{DHARMa}} package, as well as an
+#'   \code{\link[texreg]{extract}} method for printing professional tables using
+#'   \code{\link[texreg]{texreg}}. Visit the 'See Also' section for links to these
+#'   methods for `zicreg` objects.
+#'
+#' @param fmla A \code{\link[stats]{formula}} of the form `y ~ x_1 + x_2 + ... +
+#'   x_n + offset(count_var) | z_1  + ... z_n + offset(zi_var)`, where the `x`
+#'   values are covariates in the count portion of the model, and `z` are in the
+#'   zero-inflation portion. The `z` and `x` variables can be the same. If `NULL`,
+#'   design matrices, the response vector, and offsets can be entered directly; see
+#'   `X`, `z`, `y`, `offset.ct`, and `offset.zi` below.
+#' @param data A \code{\link[base]{data.frame}} containing all variables
+#'   appearing in `fmla`, including offsets. If not specified, variables are
+#'   searched for in parent environment.
+#' @param dist The distribution used for the count portion of the zero-inflated
+#'   mixture. One of `c("pois", "nbinom")`, partial matching supported.
+#' @param link.ct String specifying the link function used for the count portion
+#'   of the mixture distribution. One of `c("log", "identity", "sqrt")`.
+#'   See \code{\link[stats]{family}}.
+#' @param link.zi Character string specifying the link function used for the
+#'   zero-inflation portion of the mixture distribution. One of `c("logit",
+#'   "probit", "cauchit", "log", "cloglog")`. See \code{\link[stats]{family}}.
+#' @param optimizer String specifying the optimizer to be used for fitting, one
+#'   of `c("nlm", "optim")`. If `"optim"`, defaults to `method="BFGS"`.
+#' @param starts Optional vector of starting values used for the numerical
+#'   optimization procedure. Should have count parameters first (with intercept
+#'   first, if applicable), followed by zero-inflated parameters (with intercept
+#'   first, if applicable), and the inverse dispersion parameter last (if
+#'   applicable).
+#' @param subset an optional vector specifying a subset of observations to be
+#'   used in the fitting process.
+#' @param na.action A function which indicates what should happen when the data
+#'   contain NAs. The default is set by the na.action setting of options, and is
+#'   na.fail if that is unset. The ‘factory-fresh’ default is na.omit. Another
+#'   possible value is NULL, no action. Value na.exclude can be useful.
+#' @param weights An optional numeric vector of weights for each observation.
+#' @param X,z If `fmla = NULL`, these are the design matrices of covariates for
+#'   the count and zero-inflation portions, respectively. Both require no
+#'   missingness. Similar in spirit to \code{\link[stats]{glm.fit}} in that it
+#'   can be faster for larger datasets because it bypasses model matrix
+#'   creation.
+#' @param y If `fmla = NULL`, a vector containing the response variable.
+#' @param offset.ct,offset.zi If `fmla = NULL`, vectors containing the
+#'   (constant) offset for the count and zero-inflated portions, respectively.
+#'   Must be equal in length to `y`, and row-dim of `X`, `z`. If left `NULL`,
+#'   defaults to `rep(0, length(y))`.
+#' @param warn.parent Logical indicating whether to warn about `data` not
+#'   being supplied.
+#' @param keep Logical indicating whether to keep the model matrices in
+#'   the returned model object. Must be `TRUE` to use
+#'   \code{\link[=DHARMa]{DHARMa}} and \code{\link[texreg]{texreg}} with the
+#'   model object, e.g., via \code{\link{simulate.zicreg}} and
+#'   \code{\link{extract.zicreg}}.
+#' @param ... Additional arguments to pass on to the chosen optimizer, either
+#' \code{\link[stats]{nlm}} or \code{\link[stats]{optim}}. See 'Examples'.
+#'
+#' @example /inst/examples/zicreg_ex.R
+#'
+#' @return An S3 object (and list) of class `zicreg`.
+#' @author John Niehaus
+#' @references Lambert, Diane. "Zero-inflated Poisson regression, with an
+#'   application to defects in manufacturing." Technometrics 34.1 (1992): 1-14.
+#' @seealso \code{\link{simulate.zicreg}}, \code{\link{extract.zicreg}}.
+
 zic.reg = function(fmla = NULL,
                    data,
+                   dist = "pois",
+                   link.ct = "log",
+                   link.zi = "logit",
+                   optimizer = "nlm",
+                   starts = NULL,
                    subset,
                    na.action,
                    weights = rep(1, length(y)),
@@ -14,11 +91,6 @@ zic.reg = function(fmla = NULL,
                    y = NULL,
                    offset.ct = NULL,
                    offset.zi = NULL,
-                   dist = "pois",
-                   link.ct = "log",
-                   link.zi = "logit",
-                   starts = NULL,
-                   optimizer = "nlm",
                    warn.parent = T,
                    keep = F,
                    ...) {
@@ -182,8 +254,10 @@ zic.reg = function(fmla = NULL,
   nb = dist == "nbinom"
 
   if (!is.null(fmla)) {
+
     if (missing(data)) {
       data = environment(fmla)
+
       if (warn.parent) {
         warning("Data not supplied to function, looking in parent environment.")
       }
@@ -215,6 +289,12 @@ zic.reg = function(fmla = NULL,
     offset.zi = get.offset(attr(fmla, "rhs")[[2]], mf)
 
   }
+
+  if(is.null(offset.ct) && is.null(fmla))
+    offset.ct = rep(0, length(y))
+
+  if(is.null(offset.zi) && is.null(fmla))
+    offset.zi = rep(0, length(y))
 
   assert(
     is.null(starts) ||
@@ -253,7 +333,7 @@ zic.reg = function(fmla = NULL,
   if (!is.null(opts$hessian) && opts$hessian == F)
     warning("Arg `hessian` must be true; changing this automatically.")
   if ((!is.null(opts$control[["fnscale"]]) &&
-      opts$control[["fnscale"]] < 0) ||
+       opts$control[["fnscale"]] < 0) ||
       (!is.null(opts$fscale) && opts$fscale < 0))
     warning("Function must not be inverted; changing automatically.")
   opts$hessian = T
@@ -380,9 +460,9 @@ zic.reg = function(fmla = NULL,
           NULL))
 
   colnames(sum.mat.ct) = colnames(sum.mat.zi) = colnames(coefmat.all) = c("Estimate",
-                                                  "Std. Error",
-                                                  "z-score",
-                                                  "p-value")
+                                                                          "Std. Error",
+                                                                          "z-score",
+                                                                          "p-value")
   rownames(sum.mat.ct) = colnames(X)
   rownames(sum.mat.zi) = colnames(z)
   rownames(coefmat.all) = c(colnames(X), colnames(z), if(nb) rownames(theta) else NULL)

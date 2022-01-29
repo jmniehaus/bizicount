@@ -27,4 +27,4 @@ x = c(1,2,3)
 lambda = c(3,4)
 psi = .1
 
-dzip(x, lambda, psi, recycle=T)
+dzip(x, lambda, psi, recycle=TRUE)

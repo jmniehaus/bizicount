@@ -7,10 +7,13 @@
 #' @description The main bivariate regression function of the '\code{bizicount}'
 #'   package. Estimates copula-based bivariate zero-inflated (and non-inflated)
 #'   count models via maximum likelihood. Supports the Frank and Gaussian
-#'   copulas, as well as zero-inflated Poisson and negative binomial margins (and their
-#'   non-inflated counterparts). Has methods for outputting professional tables using
-#'   the \code{\link[texreg]{texreg}} package, and for post-estimation diagnostics with
-#'   \code{\link[DHARMa]{DHARMa}}. See the 'See Also' section for links to these methods.
+#'   copulas, as well as zero-inflated Poisson and negative binomial margins
+#'   (and their non-inflated counterparts). It's class has associated
+#'   \code{\link[stats]{simulate}} methods for post-estimation diagnostics using
+#'   the \code{\link[=DHARMa]{DHARMa}} package, as well as an
+#'   \code{\link[texreg]{extract}} method for printing professional tables using
+#'   \code{\link[texreg]{texreg}}. See the 'See Also' section for links to these
+#'   methods.
 #'
 #' @details
 #' \itemize{
@@ -52,15 +55,17 @@
 #'
 #'
 #'
-#' @param fmla1 A `formula` for the first margin. If non-inflated, of the form
-#'   `y ~ x1 + x2`; if inflated, of the form `y ~ x1 + x2 | z1 + z2`, where `y`
-#'   is the outcome for the first margin, `x` are covariates for count
-#'   parameters, and `z` are covariates for zero-inflated parameters.
-#' @param fmla2 A `formula` for the second margin. See `fmla1`.
+#' @param fmla1,fmla2 \code{\link[stats]{formula}}s for the first margin and
+#'   second margins, respectively. If non-inflated, of the form `y ~ x_1 + x_2 +
+#'   ... + x_k`; if inflated, of the form `y ~ x1 + x2 + ... + x_k| z1 + z2 +
+#'   ... + z_p`, where `y` is the outcome for the first margin, `x` are
+#'   covariates for count parameters, and `z` are covariates for zero-inflated
+#'   parameters in each margin. All covariates can be the same.
 #' @param data A dataframe containing the response variables, covariates, and
 #'   offsets for the model. If `NULL`, these quantities are searched for in the
 #'   parent environment.
-#' @param cop Character string specifying the copula to be used. One of `c("gaus", "frank")`. Partial matching supported.
+#' @param cop Character string specifying the copula to be used. One of
+#'   `c("gaus", "frank")`. Partial matching supported.
 #' @param margins Length 2 character vector specifying the marginal
 #'   distributions for each outcome. Each of the two elements must be one of
 #'   `c("pois", "nbinom", "zip", "zinb")`, and must be consistent with its
@@ -83,7 +88,7 @@
 #'   `bizicount` objects.
 #' @param subset an optional vector specifying a subset of observations to be
 #'   used in the fitting process.
-#' @param na.action a function which indicates what should happen when the data
+#' @param na.action A function which indicates what should happen when the data
 #'   contain NAs. The default is set by the na.action setting of options, and is
 #'   na.fail if that is unset. The ‘factory-fresh’ default is na.omit. Another
 #'   possible value is NULL, no action. Value na.exclude can be useful.

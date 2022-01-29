@@ -98,7 +98,11 @@ x = c(1,2,3)
 lambda = c(3,4)
 psi = .1
 
-dzip(x, lambda, psi, recycle=T)
+dzip(x, lambda, psi, recycle=TRUE)
+}
+\references{
+Lambert, Diane. "Zero-inflated Poisson regression, with an
+application to defects in manufacturing." Technometrics 34.1 (1992): 1-14.
 }
 \author{
 John Niehaus

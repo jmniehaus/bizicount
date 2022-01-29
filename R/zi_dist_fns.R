@@ -52,10 +52,13 @@
 #'    function evaluated at `p`, and `rzip` returns random variates with the
 #'    specified parameters.
 #'
-#' @example inst/examples/uni_dist_ex.R
+#' @example inst/examples/zip_dist_ex.R
 #'
 #' @author John Niehaus
-
+#'
+#' @references Lambert, Diane. "Zero-inflated Poisson regression, with an
+#'   application to defects in manufacturing." Technometrics 34.1 (1992): 1-14.
+#'
 #' @export
 dzip = function(x, lambda, psi, log=F, recycle=F){
 
@@ -218,8 +221,60 @@ qzip = function(p, lambda, psi, lower.tail=T, log.p=F, recycle=F){
 ### PMF, CDF, Quantile, Random generation for zero inflated negbin
 
 # zi nbin pmf =================================================================
+
+#' @name dzinb
+#' @title The zero-inflated negative binomial (ZINB) distribution
+#'
+#' @description These functions are used to evaluate the zero-inflated negative binomial
+#'   distribution's probability mass function (PMF), cumulative distribution
+#'   function (CDF), and quantile function (inverse CDF), as well as generate
+#'   random realizations from the ZINB distribution.
+#'
+#' @param x,q Vector of quantiles at which to evaluate the PMF and CDF,
+#'  respectively. Should be non-negative integers.
+#'
+#' @param p Vector of probabilities at which to evaluate the quantile function.
+#'
+#' @param n Number of realizations to generate from the distribution
+#'
+#' @param mu Vector of means for the count portion of the zero-inflated negative
+#'   binomial distribution. Only one of `mu` or `prob` should be specified, not
+#'   both. Should be non-negative. NOTE: This is *not* the mean of the ZINB
+#'   distribution; it is the mean of the NB component of the mixture
+#'   distribution. See \code{\link[stats:dnbinom]{nbinom}}.
+#'
+#' @param size The inverse dispersion parameter, or number of successful trials,
+#'   both for the negative binomial portion of the ZINB mixture distribution.
+#'   See \code{\link[stats:dnbinom]{nbinom}}.
+#'
+#' @param prob The probability of success on each trial in the negative binomial portion of the mixture distribution. Only one of `mu` or
+#'   `prob` should be specified, not both. See \code{\link[stats:dnbinom]{nbinom}}.
+#'
+#' @param psi Vector of zero-inflation probabilities.
+#'
+#' @param log,log.p Logical indicating whether probabilities should be returned
+#'  on log scale (for `dzip` and `pzip`), or are supplied on log-scale (for `qzip`).
+#'
+#' @param lower.tail Logical indicating whether probabilities should be
+#'    \eqn{Pr(X \le x)} or \eqn{Pr(X > x)}
+#'
+#' @param recycle Logical indicating whether to permit arbitrary recycling of
+#'    arguments with unequal length. See 'Details' and 'Examples.'
+#'
+#' @return `dzinb` returns the mass function evaluated at `x`,
+#'    `pzinb` returns the CDF evaluated at `q`, `qzinb` returns the quantile
+#'    function evaluated at `p`, and `rzinb` returns random realizations with the
+#'    specified parameters.
+#'
+#' @author John Niehaus
+#'
+#' @references Lambert, Diane. "Zero-inflated Poisson regression, with an
+#'   application to defects in manufacturing." Technometrics 34.1 (1992): 1-14.
+#'
+#' @example /inst/examples/zinb_dist_ex.R
+#'
 #' @export
-dzinb = function(x, size, psi,  prob=NULL, mu=NULL, log=F, recycle=F){
+dzinb = function(x, size, psi, mu=NULL, prob=NULL, lower.tail=T, log=F, recycle=F){
 
   if(!env_has(e.check, "zi.dens.checks")){
     check_dist_args(negbin=T, recycle=recycle)
@@ -271,8 +326,9 @@ dzinb = function(x, size, psi,  prob=NULL, mu=NULL, log=F, recycle=F){
 
 
 # zi nbin cdf =================================================================
+#' @rdname dzinb
 #' @export
-pzinb = function(q, size, psi, prob=NULL, mu=NULL,  lower.tail=T, log.p=F, recycle=F){
+pzinb = function(q, size, psi,  mu=NULL, prob=NULL, lower.tail=T, log.p=F, recycle=F){
 
   if(!env_has(e.check, "zi.dens.checks")){
     check_dist_args(negbin=T, recycle=recycle)
@@ -318,8 +374,9 @@ pzinb = function(q, size, psi, prob=NULL, mu=NULL,  lower.tail=T, log.p=F, recyc
 
 
 # zi nbin quantile =============================================================
+#' @rdname dzinb
 #' @export
-qzinb = function(p, size, psi, prob=NULL, mu=NULL, lower.tail=T, log.p=F, recycle=F){
+qzinb = function(p, size, psi, mu=NULL, prob=NULL, lower.tail=T, log.p=F, recycle=F){
 
   if(!env_has(e.check, "zi.dens.checks")){
     check_dist_args(negbin=T, recycle=recycle)
@@ -367,6 +424,7 @@ qzinb = function(p, size, psi, prob=NULL, mu=NULL, lower.tail=T, log.p=F, recycl
 
 
 # zi nbin rng =================================================================
+#' @rdname dzinb
 #' @export
 rzinb = function(n, size, psi, mu=NULL, prob=NULL, recycle=F){
 
