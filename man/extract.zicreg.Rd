@@ -2,10 +2,32 @@
 % Please edit documentation in R/generics.R
 \name{extract.zicreg}
 \alias{extract.zicreg}
-\title{This is a title}
+\title{Texreg for zicreg objects}
 \usage{
-extract.zicreg(model, CI = NULL, id = T)
+\method{extract}{zicreg}(model, CI = NULL, id = T)
+}
+\arguments{
+\item{model}{A zicreg model object (S3).}
+
+\item{CI}{The two-tailed confidence level, if desired in the texreg object.}
+
+\item{id}{Logical indicating whether to prepend equation identifiers to
+coefficient names (\code{ct_} for count parameters, \code{zi_} for zero-inflated parameters)}
+}
+\value{
+A \code{link[texreg]{texreg-class}} object, as produced by
+\code{link[texreg]{createTexreg}}, which can interface with all of that
+package's methods.
 }
 \description{
-This is a description
+This is a method for the \code{\link[texreg]{extract}} generic
+to be used with \code{\link{zicreg-class}} objects that are output from the
+\code{\link{zic.reg}} function.
+}
+\seealso{
+\code{\link[texreg]{extract}}, \code{\link[texreg]{createTexreg}},
+\code{\link[bizicount]{zic.reg}}
+}
+\author{
+John Niehaus
 }

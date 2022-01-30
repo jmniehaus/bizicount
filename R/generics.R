@@ -237,7 +237,40 @@ extract.bizicount = function(model, CI=NULL, id=T){
 
 }
 
-
+#' @title The bizicount S4 Class
+#' @description Note that `bizicount` objects are, in general, S3. However,
+#' this S4 class is defined for compatability with \code{\link[texreg]{texreg}}.
+#' Interaction with `bizicount` objects should generally use S3 syntax.
+#' @slot coef Coefficients of the model
+#' @slot coef.nid Coefficients without margin IDs
+#' @slot coef.orig Coefficients prior to transformations, for Gaussian
+#'   dependence and negative binomial dispersion.
+#' @slot coef.orig.nid Coefficients prior to transforms, no margin IDs.
+#' @slot se Asymptotic standard errors based on observed Fisher Information
+#' @slot se.nid Standard errors without margin IDs
+#' @slot z z-scores for parameter estimates
+#' @slot z.nid z-scores without margin IDs
+#' @slot p p-values for parameter estimates
+#' @slot p.nid p-values without margin IDs
+#' @slot coefmats A list containing coeficient matrices for each margin
+#' @slot loglik Scalar log-likelihood at convergence
+#' @slot grad Gradient vector at convergence
+#' @slot n.iter Number of quasi-newton fitting iterations.
+#' @slot covmat Covariance matrix of parameter estimates based on observed Fisher Information
+#' @slot aic Model's Akaike information
+#' @slot bic Model's Bayesian information criterion
+#' @slot nobs Number of observations
+#' @slot margins Marginal distributions used in fitting
+#' @slot link.zi,link.ct Names of link functions used in fitting
+#' @slot invlink.ct,invlink.zi Inverse link functions used in fitting (the
+#'   actual function, not their names)
+#' @slot outcomes Name of the response vector
+#' @slot conv Integer telling convergence status.
+#' @slot cop The copula used in fitting
+#' @slot starts list of starting values used
+#' @slot call The model's call
+#' @slot model List containing model matrices, or `NULL` if `keep = F`.
+#' @export
 setClass("bizicount",
          representation(coef = "numeric",
                         coef.nid = "numeric",
@@ -271,7 +304,7 @@ setClass("bizicount",
          )
 )
 
-setMethod("extract",
+setMethod(texreg::extract,
           signature = "bizicount",
           definition= extract.bizicount)
 
@@ -643,8 +676,21 @@ predict.zicreg = function(object,
 
 # Function for texregging output
 #' @name extract.zicreg
-#' @title This is a title
-#' @description This is a description
+#' @title Texreg for zicreg objects
+#' @description This is a method for the \code{\link[texreg]{extract}} generic
+#'   to be used with \code{\link{zicreg-class}} objects that are output from the
+#'   \code{\link{zic.reg}} function.
+#' @method extract zicreg
+#' @param model A zicreg model object (S3).
+#' @param CI The two-tailed confidence level, if desired in the texreg object.
+#' @param id Logical indicating whether to prepend equation identifiers to
+#'   coefficient names (`ct_` for count parameters, `zi_` for zero-inflated parameters)
+#' @return A \code{link[texreg]{texreg-class}} object, as produced by
+#'   \code{link[texreg]{createTexreg}}, which can interface with all of that
+#'   package's methods.
+#' @author John Niehaus
+#' @seealso \code{\link[texreg]{extract}}, \code{\link[texreg]{createTexreg}},
+#'   \code{\link[bizicount]{zic.reg}}
 #' @export
 extract.zicreg = function(model, CI = NULL, id = T) {
   if (!is.null(CI) &&
@@ -708,7 +754,31 @@ extract.zicreg = function(model, CI = NULL, id = T) {
   return(tr)
 }
 
-
+#' @title The zicreg S4 Class
+#' @description Note that `zicreg` objects are, in general, S3. However,
+#' this S4 class is defined for compatability with \code{\link[texreg]{texreg}}.
+#' Interaction with `zicreg` objects should generally use S3 syntax, but the below
+#' objects have the same name in both the S3 and S4 objects (but are in a list for S3).
+#' @slot call The original function call
+#' @slot obj The class of the object
+#' @slot coef Vector of coefficients, with count, then zi, then dispersion.
+#' @slot se Vector of asymptotic standard errors
+#' @slot grad Gradient vector at convergence
+#' @slot link.ct Name of link used for count portion
+#' @slot link.zi Name of link used for zero-inflated portion
+#' @slot dist Name of distribution used for count portion
+#' @slot optimizer Name of optimization package used in fitting
+#' @slot coefmat.ct Coefficient matrix for count portion
+#' @slot coefmat.zi Coefficient matrix for zero-inflated portion
+#' @slot coefmat.all Coefficient matrix for both parts of the model
+#' @slot theta Coefficient matrix for dispersion, if applicable.
+#' @slot covmat Asymptotic covariance matrix
+#' @slot nobs Number of observations
+#' @slot aic Akaike information
+#' @slot bic Bayes information
+#' @slot loglik Log-likelihood at convergence
+#' @slot model List containing model matrices if `keep = TRUE`
+#' @export
 setClass(
   "zicreg",
   representation(
