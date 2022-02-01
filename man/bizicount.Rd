@@ -194,17 +194,41 @@ gen = function(n,
      return(dat)
 }
 
+# define parameters
 b1 = c(1, -2, 3)
 b2 = c(-1, 3, 1)
 g1 = c(2, -1.5, 2)
 g2 = c(-1, -3.75, 1.25)
 rho = .5
 
+# generate data
 dat = gen(n, b1, b2, g1, g2, rho)
 f1 = y1 ~ X1.1 + X1.2 | Z1.1 + Z1.2
 f2 = y2 ~ X2.1 + X2.2 | Z2.1 + Z2.2
 
-bizicount(f1, f2, dat, cop = "g", margins = c("zinb", "zip"))
+# estimate model
+mod = bizicount(f1, f2, dat, cop = "g", margins = c("zinb", "zip"), keep=TRUE)
+
+# diagnose model with DHARMa (will produce 6 plots, and print to console)
+# see end for simulate.bizicount example.
+
+dharm = make_DHARMa(mod)
+lapply(dharm, plot)
+lapply(dharm, DHARMa::testResiduals)
+
+# extract texreg objects, one with SEs, one with CIs
+tr_obj_se = extract(mod)
+tr_obj_ci = extract(mod, CI = .95)
+
+# output to latex, single table.
+# Note use of c(), because tr_obj_se, tr_obj_ci are lists.
+texreg(c(tr_obj_se, tr_obj_ci))
+
+# output as plaintext, two tables
+screenreg(tr_obj_se)
+screenreg(tr_obj_ci)
+
+
 }
 \author{
 John Niehaus

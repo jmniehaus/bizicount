@@ -19,8 +19,9 @@ Imports:
      numDeriv (>= 2016.8-1.1),
      methods,
      stats,
-     utils
+     utils,
+     DHARMa (>= 0.3.4)
 Depends:
      R (>= 4.1.0),
-     DHARMa (>= 0.3.4),
      texreg (>= 1.37.5)
+

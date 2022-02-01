@@ -185,6 +185,7 @@ print.summary.bizicount = function(x, stars=T, ...){
 #' @return A \code{link[texreg]{texreg-class}} object, as produced by
 #'   \code{link[texreg]{createTexreg}}, which can interface with all of that
 #'   package's methods.
+#' @example inst/examples/bizicount_ex.R
 #' @author John Niehaus
 #' @seealso \code{\link[texreg]{extract}}, \code{\link[texreg]{createTexreg}},
 #'   \code{\link[bizicount]{bizicount}}
@@ -342,6 +343,7 @@ setMethod(texreg::extract,
 #' @return A length 2 list, with each entry containing a numeric \eqn{n \times
 #'   nsim} matrix for each margin of the bizicount model. Rows index
 #'   the observation, and columns index the simulated dataset number.
+#' @example inst/examples/bizicount_ex.R
 #' @author John Niehaus
 #' @export
 simulate.bizicount = function(object, nsim=250, seed=123, ...){
@@ -441,6 +443,7 @@ simulate.bizicount = function(object, nsim=250, seed=123, ...){
 #' @param nsim Number of simulated responses from the fitted model to use for diagnostics.
 #' @param seed Random seed for simulating from fitted model.
 #' @param method See \code{\link[DHARMa]{createDHARMa}}.
+#' @example inst/examples/bizicount_ex.R
 #' @export
 make_DHARMa = function(object, nsim=250, seed=123, method="PIT"){
      if( !any(class(object) == "bizicount") )
