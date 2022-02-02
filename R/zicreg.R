@@ -1,7 +1,3 @@
-#' @importFrom rlang env_has
-#' @importFrom rlang env_poke
-#' @import Formula
-
 #univariate regression function
 #' @export
 #' @name zic.reg
@@ -230,7 +226,7 @@ zic.reg = function(fmla = NULL,
 
     d.zi = z * d.zi * weights
     d.ct = X * d.ct * weights
-    d.th = theta * d.th * weights # multiply by theta due to exponential transform
+    d.th = theta * d.th * weights # multiply by theta due to exponential transform/chain rule
 
     return(-unname(colSums(cbind(d.ct, d.zi, d.th))))
 
@@ -246,10 +242,6 @@ zic.reg = function(fmla = NULL,
   if (!env_has(e.check, "zi.dens.checks"))
     env_poke(e.check, "zi.dens.checks", T)
   on.exit(rm("zi.dens.checks", envir = e.check), add = T)
-
-  environment(zic.ll) = environment()
-  environment(nbinom.grad) = environment()
-  environment(pois.grad) = environment()
 
   nb = dist == "nbinom"
 
@@ -302,7 +294,7 @@ zic.reg = function(fmla = NULL,
     "Vector of starting values (`starts`) is not of correct length."
   )
 
-  #get starting values using glm, or simplex run
+  #get starting values using glm
   if (is.null(starts)) {
     start.zi = glm.fit(
       z,

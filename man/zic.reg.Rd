@@ -188,17 +188,17 @@ DHARMa::testResiduals(dharm)
 
 # extract information
 
-tr_obj_se = extract(mod)
-tr_obj_ci = extract(mod, CI = .95)
+tr_obj_se = texreg::extract(mod)
+tr_obj_ci = texreg::extract(mod, CI = .95)
 
 # output to latex, single table
 
-texreg(list(tr_obj_se, tr_obj_ci))
+texreg::texreg(list(tr_obj_se, tr_obj_ci))
 
 # output to plain text, multiple tables
 
-screenreg(tr_obj_se)
-screenreg(tr_obj_ci)
+texreg::screenreg(tr_obj_se)
+texreg::screenreg(tr_obj_ci)
 
 }
 \references{

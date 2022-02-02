@@ -105,15 +105,6 @@
 #'   may be useful to alter.
 #'
 #' @author John Niehaus
-#' @importFrom pbivnorm pbivnorm
-#' @importFrom numDeriv hessian
-#' @importFrom MASS glm.nb
-#' @import stats
-#' @import utils
-#' @import methods
-#' @importFrom rlang env_has
-#' @importFrom rlang env_poke
-#' @import Formula
 #'
 #'
 #' @export

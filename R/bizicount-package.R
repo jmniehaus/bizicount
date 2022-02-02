@@ -1,3 +1,16 @@
+#' @importFrom texreg extract
+#' @importFrom texreg createTexreg
+#' @importFrom DHARMa createDHARMa
+#' @importFrom rlang env_has
+#' @importFrom rlang env_poke
+#' @import Formula
+#' @importFrom pbivnorm pbivnorm
+#' @importFrom numDeriv hessian
+#' @importFrom MASS glm.nb
+#' @import stats
+#' @import utils
+#' @import methods
+#'
 #' @title bizicount: Copula-Based Bivariate Zero-Inflated Count Regression
 #'   Models
 #'

@@ -1,9 +1,3 @@
-#' @importFrom texreg extract
-#' @importFrom texreg createTexreg
-#' @importFrom DHARMa createDHARMa
-
-
-
 #' @export
 print.bizicount= function(x, ...){
 
@@ -182,8 +176,8 @@ print.summary.bizicount = function(x, stars=T, ...){
 #'   desired in the texreg object, otherwise `NULL`.
 #' @param id Logical indicating whether to prepend equation identifiers to
 #'   coefficient names (`ct_` for count parameters, `zi_` for zero-inflated parameters)
-#' @return A \code{link[texreg]{texreg-class}} object, as produced by
-#'   \code{link[texreg]{createTexreg}}, which can interface with all of that
+#' @return A \code{\link[texreg]{texreg-class}} object, as produced by
+#'   \code{\link[texreg]{createTexreg}}, which can interface with all of that
 #'   package's methods.
 #' @example inst/examples/bizicount_ex.R
 #' @author John Niehaus

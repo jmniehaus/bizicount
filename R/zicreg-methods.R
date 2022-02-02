@@ -1,4 +1,4 @@
-#' @importFrom texreg extract
+
 #' @importFrom texreg createTexreg
 #' @importFrom DHARMa createDHARMa
 
@@ -171,6 +171,30 @@ fitted.zicreg = function(object, ...) {
   })
 }
 
+
+#' @name predict.zicreg
+#' @title Predictions for univariate zero-inflated count regression models
+#' @description Predicts the mean, probability, count mean, or zero-inflation
+#'   probability for new data using parameters from a fitted zero-inflated count
+#'   regression model.
+#'
+#' @param object A fitted \code{\link{zic.reg}} object.
+#'
+#' @param newdata A \code{\link[base]{data.frame}} containing new values of the same covariates appearing in fitted model.
+#'
+#' @param y.new An optional vector of new response values, used only for `type = "prob"`.
+#'
+#' @param type String, one of `c("mean", "prob", "psi", "lambda")`. `"mean"`
+#'   will predict the conditional mean of the mixture distribution, `"prob"`
+#'   will predict the probability of a new response value, `"psi"` will predict
+#'   the probability of zero-inflation, and `"lambda"` will predict the mean of
+#'   the count portion of the mixture distribution. NOTE: Setting `type =
+#'   "mean"` and leaving `newdata = NULL` is the same as calling
+#'   `fitted(object)`.
+#'
+#' @param ... Ignored.
+#'
+#'
 #' @export
 predict.zicreg = function(object,
                           newdata = NULL,
@@ -285,8 +309,8 @@ predict.zicreg = function(object,
 #' @param CI The two-tailed confidence level, if desired in the texreg object.
 #' @param id Logical indicating whether to prepend equation identifiers to
 #'   coefficient names (`ct_` for count parameters, `zi_` for zero-inflated parameters)
-#' @return A \code{link[texreg]{texreg-class}} object, as produced by
-#'   \code{link[texreg]{createTexreg}}, which can interface with all of that
+#' @return A \code{\link[texreg]{texreg-class}} object, as produced by
+#'   \code{\link[texreg]{createTexreg}}, which can interface with all of that
 #'   package's methods.
 #' @author John Niehaus
 #' @seealso \code{\link[texreg]{extract}}, \code{\link[texreg]{createTexreg}},
@@ -406,7 +430,7 @@ setClass(
     model = "ANY"
   )
 )
-setMethod("extract", signature = "zicreg", definition = extract.zicreg)
+setMethod(texreg::extract, signature = "zicreg", definition = extract.zicreg)
 
 
 
