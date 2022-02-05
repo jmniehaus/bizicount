@@ -30,23 +30,16 @@ function to conveniently get DHARMa objects for each margin of a bizicount
 model.
 }
 \examples{
-### bizicount example
-
 ## SETUP
 set.seed(123)
-n = 500
+n = 300
 
 # define a function to simulate from a gaussian copula
 # first margin is zero-inflated negative binomial (zinb)
 # second margin is zero-inflated poisson (zip)
 # Note: marginal distributions are hard-coded in function, including
 # inverse dispersion parameter for zinb.
-gen = function(n,
-               b1,
-               b2,
-               g1,
-               g2,
-               dep) {
+gen = function(n, b1, b2, g1, g2, dep) {
 
      k1 = length(b1)
      k2 = length(b2)
@@ -67,7 +60,7 @@ gen = function(n,
           n,
           mu = c(0, 0),
           Sigma = matrix(c(1, dep, dep, 1), ncol =2)
-          )
+     )
 
      U = pnorm(norm_vars)
 
@@ -110,56 +103,20 @@ f2 = y2 ~ X2.1 + X2.2 | Z2.1 + Z2.2
 
 ## END SETUP
 
+
+
+
 # estimate model
 
 mod = bizicount(f1, f2, dat, cop = "g", margins = c("zinb", "zip"), keep=TRUE)
 
 
-# diagnose model with DHARMa (will produce 6 plots, and print to console)
+# diagnose model with DHARMa
 # see end for simulate.bizicount example.
 
-dharm = make_DHARMa(mod)
-lapply(dharm, plot)
+dharm = make_DHARMa(mod, nsim = 150)
+
 lapply(dharm, DHARMa::testResiduals)
-
-
-# extract texreg objects, one with SEs, one with CIs
-tr_obj_se = texreg::extract(mod)
-tr_obj_ci = texreg::extract(mod, CI = .95)
-
-
-# output to latex, single table.
-# Note use of c(), because tr_obj_se, tr_obj_ci are lists.
-texreg::texreg(c(tr_obj_se, tr_obj_ci))
-
-
-# output as plaintext, two tables
-texreg::screenreg(tr_obj_se)
-texreg::screenreg(tr_obj_ci)
-
-
-## Alternatively, manually simulate, use DHARMa that way.
-sims = simulate(mod)
-
-d1 = DHARMa::createDHARMa(
-        simulatedResponse = sims[[1]],
-        observedResponse = dat$y1,
-        fittedPredictedResponse = fitted(mod)[,1],
-        integerResponse = TRUE,
-        method = "PIT"
-)
-
-d2 = DHARMa::createDHARMa(
-        simulatedResponse = sims[[2]],
-        observedResponse = dat$y2,
-        fittedPredictedResponse = fitted(mod)[,2],
-        integerResponse = TRUE,
-        method = "PIT"
-)
-
-DHARMa::testResiduals(d1)
-DHARMa::testResiduals(d2)
-
 }
 \seealso{
 \code{\link[DHARMa]{DHARMa}}, \code{\link[DHARMa]{createDHARMa}},

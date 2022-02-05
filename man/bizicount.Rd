@@ -216,52 +216,8 @@ f2 = y2 ~ X2.1 + X2.2 | Z2.1 + Z2.2
 
 mod = bizicount(f1, f2, dat, cop = "g", margins = c("zinb", "zip"), keep=TRUE)
 
-
-# diagnose model with DHARMa (will produce 6 plots, and print to console)
-# see end for simulate.bizicount example.
-
-dharm = make_DHARMa(mod)
-lapply(dharm, plot)
-lapply(dharm, DHARMa::testResiduals)
-
-
-# extract texreg objects, one with SEs, one with CIs
-tr_obj_se = texreg::extract(mod)
-tr_obj_ci = texreg::extract(mod, CI = .95)
-
-
-# output to latex, single table.
-# Note use of c(), because tr_obj_se, tr_obj_ci are lists.
-texreg::texreg(c(tr_obj_se, tr_obj_ci))
-
-
-# output as plaintext, two tables
-texreg::screenreg(tr_obj_se)
-texreg::screenreg(tr_obj_ci)
-
-
-## Alternatively, manually simulate, use DHARMa that way.
-sims = simulate(mod)
-
-d1 = DHARMa::createDHARMa(
-        simulatedResponse = sims[[1]],
-        observedResponse = dat$y1,
-        fittedPredictedResponse = fitted(mod)[,1],
-        integerResponse = TRUE,
-        method = "PIT"
-)
-
-d2 = DHARMa::createDHARMa(
-        simulatedResponse = sims[[2]],
-        observedResponse = dat$y2,
-        fittedPredictedResponse = fitted(mod)[,2],
-        integerResponse = TRUE,
-        method = "PIT"
-)
-
-DHARMa::testResiduals(d1)
-DHARMa::testResiduals(d2)
-
+print(mod)
+summary(mod)
 }
 \author{
 John Niehaus

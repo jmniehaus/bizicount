@@ -7,6 +7,7 @@
 #' @importFrom pbivnorm pbivnorm
 #' @importFrom numDeriv hessian
 #' @importFrom MASS glm.nb
+#' @importFrom MASS mvrnorm
 #' @import stats
 #' @import utils
 #' @import methods

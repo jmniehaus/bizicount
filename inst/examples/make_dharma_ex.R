@@ -1,20 +1,13 @@
-### bizicount example
-
 ## SETUP
 set.seed(123)
-n = 500
+n = 300
 
 # define a function to simulate from a gaussian copula
 # first margin is zero-inflated negative binomial (zinb)
 # second margin is zero-inflated poisson (zip)
 # Note: marginal distributions are hard-coded in function, including
 # inverse dispersion parameter for zinb.
-gen = function(n,
-               b1,
-               b2,
-               g1,
-               g2,
-               dep) {
+gen = function(n, b1, b2, g1, g2, dep) {
 
      k1 = length(b1)
      k2 = length(b2)
@@ -35,7 +28,7 @@ gen = function(n,
           n,
           mu = c(0, 0),
           Sigma = matrix(c(1, dep, dep, 1), ncol =2)
-          )
+     )
 
      U = pnorm(norm_vars)
 
@@ -78,9 +71,17 @@ f2 = y2 ~ X2.1 + X2.2 | Z2.1 + Z2.2
 
 ## END SETUP
 
+
+
+
 # estimate model
 
 mod = bizicount(f1, f2, dat, cop = "g", margins = c("zinb", "zip"), keep=TRUE)
 
-print(mod)
-summary(mod)
+
+# diagnose model with DHARMa
+# see end for simulate.bizicount example.
+
+dharm = make_DHARMa(mod, nsim = 150)
+
+lapply(dharm, DHARMa::testResiduals)

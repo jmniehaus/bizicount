@@ -2,13 +2,12 @@ Package: bizicount
 Title: Bivariate Zero-Inflated Count Models Using Copulas
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: A package for maximum likelihood estimation of copula-based zero-inflated (in addition to not zero-inflated) Poisson and negative binomial count models. Supports Frank and Gaussian copulas. Allows for mixed margins (e.g., one margin Poisson, the other ZINB), and several marginal link functions. Built-in methods for publication-quality tables using 'texreg', and post-estimation diagnostics using 'DHARMa'. 
+    person("John", "Niehaus", , "jniehaus2257@gmail.com", role = c("aut", "cre"))
+Description: Maximum likelihood estimation of copula-based zero-inflated (and non-inflated) Poisson and negative binomial count models. Supports Frank and Gaussian copulas. Allows for mixed margins (e.g., one margin Poisson, the other zero-inflated negative binomial), and several marginal link functions. Built-in methods for publication-quality tables using 'texreg', and post-estimation diagnostics using 'DHARMa'. The author acknowledges support by NSF DMS-1925119 and DMS-212324.
 License: GPL (>= 3)
 Encoding: UTF-8
 URL: https://github.com/jmniehaus/bizicount
-bugreports: https://github.com/jmniehaus/bizicount
+BugReports: https://github.com/jmniehaus/bizicount
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Imports: 
@@ -24,5 +23,6 @@ Imports:
      texreg (>= 1.37.5)
 Depends:
      R (>= 4.1.0)
-
-
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

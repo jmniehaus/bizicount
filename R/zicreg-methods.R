@@ -1,7 +1,3 @@
-
-#' @importFrom texreg createTexreg
-#' @importFrom DHARMa createDHARMa
-
 ## Generics for univariate regression model (zic.reg)
 #' @export
 summary.zicreg = function(object, ...) {
@@ -98,7 +94,7 @@ vcov.zicreg = function(object, ...)
 #' @param ... Ignored.
 #' @returns A numeric \eqn{n x nsim} matrix, with rows indexing
 #'   observations, and columns indexing the simulation number.
-#' @example /inst/examples/zicreg_ex.R
+#' @example /inst/examples/simulate_zicreg_ex.R
 #' @author John Niehaus
 simulate.zicreg = function(object, nsim = 250, seed=123, ...) {
   if (is.null(object$model))
@@ -194,6 +190,9 @@ fitted.zicreg = function(object, ...) {
 #'
 #' @param ... Ignored.
 #'
+#' @example /inst/examples/predict_zicreg_ex.R
+#'
+#' @author John Niehaus
 #'
 #' @export
 predict.zicreg = function(object,
@@ -315,7 +314,7 @@ predict.zicreg = function(object,
 #' @author John Niehaus
 #' @seealso \code{\link[texreg]{extract}}, \code{\link[texreg]{createTexreg}},
 #'   \code{\link[bizicount]{zic.reg}}
-#' @example /inst/examples/zicreg_ex.R
+#' @example /inst/examples/extract_zicreg_ex.R
 #' @export
 extract.zicreg = function(model, CI = NULL, id = T) {
   if (!is.null(CI) &&

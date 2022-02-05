@@ -1,5 +1,3 @@
-#zic.reg examples
-
 ## ZIP example
 # Simulate some zip data
 n=1000
@@ -11,11 +9,15 @@ lam = exp(x %*% b)
 psi = plogis(z %*% g)
 
 y = bizicount::rzip(n, lambda = lam, psi=psi)
-
+dat = cbind.data.frame(x = x[,-1], z = z[,-1], y = y)
 
 # estimate zip model using NLM, no data.frame
 
 mod = zic.reg(y ~ x[,-1] | z[,-1])
+
+# same model, with dataframe
+
+mod = zic.reg(y ~ x | z, data = dat)
 
 
 # estimate zip using NLM, adjust stepmax via ... param
@@ -45,7 +47,6 @@ zic.reg(y=y, X=x, z=z)
 # simulate zinb data
 
 disp = .5
-
 y = bizicount::rzinb(n, psi = psi, size = disp, mu=lam)
 
 
@@ -53,43 +54,6 @@ y = bizicount::rzinb(n, psi = psi, size = disp, mu=lam)
 
 mod = zic.reg(y ~ x[,-1] | z[,-1], dist = "n", keep = TRUE)
 
-
-
-## Make DHARMa object for diagnostics
-
-# simulate from fitted model
-
-sims = simulate(mod)
-
-# Make dharma object
-
-dharm = DHARMa::createDHARMa(
-     simulatedResponse = sims,
-     observedResponse = y,
-     fittedPredictedResponse = fitted(mod),
-     integerResponse = TRUE,
-     method = "PIT"
-)
-
-# Plot the DHARMa object, shows that model fit is poor
-plot(dharm)
-DHARMa::testResiduals(dharm)
-
-
-
-## Output to table with texreg
-
-# extract information
-
-tr_obj_se = texreg::extract(mod)
-tr_obj_ci = texreg::extract(mod, CI = .95)
-
-# output to latex, single table
-
-texreg::texreg(list(tr_obj_se, tr_obj_ci))
-
-# output to plain text, multiple tables
-
-texreg::screenreg(tr_obj_se)
-texreg::screenreg(tr_obj_ci)
+print(mod)
+summary(mod)
 

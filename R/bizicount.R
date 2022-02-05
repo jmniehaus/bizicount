@@ -307,14 +307,10 @@ bizicount = function(fmla1,
 
 
 
-
   cop     = match_arg(cop, c("frank", "gaus"))
   link.ct = match_arg(link.ct, c("sqrt", "identity", "log"), several.ok = T)
   link.zi = match_arg(link.zi, c("logit", "probit", "cauchit", "log", "cloglog"), several.ok = T)
 
-  # Redefine copula likelihood's environment
-  environment(cop.lik) = environment()
-  environment(starts.marginal) = environment()
 
   # indices for getting parms/matrices etc from formulas
   n.zi = sum(grepl("zi", margins))
