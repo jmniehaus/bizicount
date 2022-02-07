@@ -4,7 +4,6 @@
   [![R-CMD-check](https://github.com/jmniehaus/bizicount/workflows/R-CMD-check/badge.svg)](https://github.com/jmniehaus/bizicount/actions)
   [![minimal R version](https://img.shields.io/badge/R%3E%3D-4.1.0-6666ff.svg)](https://cran.r-project.org/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![packageversion](https://img.shields.io/badge/Package%20version-1.0.0-lightgrey.svg?style=flat-square)](commits/main)
   <!-- badges: end -->
 
 The `bizicount` R-package is primarily for estimating copula-based bivariate 
