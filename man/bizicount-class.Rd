@@ -5,9 +5,10 @@
 \alias{bizicount-class}
 \title{The bizicount S4 Class}
 \description{
-Note that \code{bizicount} objects are, in general, S3. However,
-this S4 class is defined for compatability with \code{\link[texreg]{texreg}}.
-Interaction with \code{bizicount} objects should generally use S3 syntax.
+Note that \code{bizicount} objects are generally S3, and should use
+S3 syntax. This S4 class is defined only for compatability with
+\code{\link[texreg]{texreg}}. However, the contents of \code{bizicount} objects
+is the same in both S3 and S4, so the descriptions below apply in both cases.
 }
 \section{Slots}{
 

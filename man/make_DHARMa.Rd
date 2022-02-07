@@ -118,6 +118,11 @@ dharm = make_DHARMa(mod, nsim = 150)
 
 lapply(dharm, DHARMa::testResiduals)
 }
+\references{
+Florian Hartig (2022). DHARMa: Residual Diagnostics for
+Hierarchical (Multi-Level / Mixed) Regression Models. R package version
+0.4.5. https://CRAN.R-project.org/package=DHARMa
+}
 \seealso{
 \code{\link[DHARMa]{DHARMa}}, \code{\link[DHARMa]{createDHARMa}},
 \code{\link{simulate.bizicount}}

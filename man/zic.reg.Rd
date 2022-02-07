@@ -55,13 +55,11 @@ first, if applicable), followed by zero-inflated parameters (with intercept
 first, if applicable), and the inverse dispersion parameter last (if
 applicable).}
 
-\item{subset}{an optional vector specifying a subset of observations to be
-used in the fitting process.}
+\item{subset}{Vector indicating the subset of observations on which to
+estimate the model}
 
 \item{na.action}{A function which indicates what should happen when the data
-contain NAs. The default is set by the na.action setting of options, and is
-na.fail if that is unset. The ‘factory-fresh’ default is na.omit. Another
-possible value is NULL, no action. Value na.exclude can be useful.}
+contain NAs. Default is \code{\link[stats]{na.omit}}.}
 
 \item{weights}{An optional numeric vector of weights for each observation.}
 
@@ -81,17 +79,19 @@ defaults to \code{rep(0, length(y))}.}
 \item{warn.parent}{Logical indicating whether to warn about \code{data} not
 being supplied.}
 
-\item{keep}{Logical indicating whether to keep the model matrices in
-the returned model object. Must be \code{TRUE} to use
-\code{\link[=DHARMa]{DHARMa}} and \code{\link[texreg]{texreg}} with the
-model object, e.g., via \code{\link{simulate.zicreg}} and
-\code{\link{extract.zicreg}}.}
+\item{keep}{Logical indicating whether to keep the model matrices in the
+returned model object. Must be \code{TRUE} to use \code{\link[=DHARMa]{DHARMa}}
+and \code{\link[texreg]{texreg}} with the model object, e.g., via
+\code{\link{simulate.zicreg}} and \code{\link{extract.zicreg}}, as well as
+base generics like \code{\link[stats]{fitted}} and
+\code{\link[stats]{predict}}.}
 
 \item{...}{Additional arguments to pass on to the chosen optimizer, either
 \code{\link[stats]{nlm}} or \code{\link[stats]{optim}}. See 'Examples'.}
 }
 \value{
-An S3 object (and list) of class \code{zicreg}.
+An S3 \code{\link{zicreg-class}}, which is a list. See the link for
+details on it's contents.
 }
 \description{
 This function from the \code{\link{bizicount}} package estimates
@@ -170,7 +170,7 @@ Lambert, Diane. "Zero-inflated Poisson regression, with an
 application to defects in manufacturing." Technometrics 34.1 (1992): 1-14.
 }
 \seealso{
-\code{\link{simulate.zicreg}}, \code{\link{extract.zicreg}}.
+\code{\link{simulate.zicreg}}, \code{\link{extract.zicreg}}
 }
 \author{
 John Niehaus

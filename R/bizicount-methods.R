@@ -168,8 +168,9 @@ print.summary.bizicount = function(x, stars=T, ...){
 #' @name extract.bizicount
 #' @title Texreg for bizicount objects
 #' @description This is a method for the \code{\link[texreg]{extract}} generic
-#'   to be used with \code{\link{bizicount-class}} objects that are output from the
-#'   \code{\link{bizicount}} function.
+#'   to be used with objects that are output from the \code{\link{bizicount}}
+#'   function. The results can be used with any of the
+#'   \code{\link[texreg]{texreg-package}} generics.
 #' @method extract bizicount
 #' @param model A \code{\link{bizicount-class}} model object (S3).
 #' @param CI The two-tailed confidence level, if confidence intervals are
@@ -178,8 +179,16 @@ print.summary.bizicount = function(x, stars=T, ...){
 #'   coefficient names (`ct_` for count parameters, `zi_` for zero-inflated parameters)
 #' @return A \code{\link[texreg]{texreg-class}} object, as produced by
 #'   \code{\link[texreg]{createTexreg}}, which can interface with all of that
-#'   package's methods.
+#'   package's generics.
+#' @note Users can typically just call \code{\link[texreg]{texreg}} directly on
+#'   a \code{\link{bizicount-class}} object, instead of first extracting and
+#'   then calling texreg.
 #' @example inst/examples/extract_bizicount_ex.R
+#'
+#' @references Leifeld, Philip (2013). texreg: Conversion of Statistical Model
+#'   Output in R to LaTeX and HTML Tables. Journal of Statistical Software,
+#'   55(8), 1-24. URL http://dx.doi.org/10.18637/jss.v055.i08.
+#'
 #' @author John Niehaus
 #' @seealso \code{\link[texreg]{extract}}, \code{\link[texreg]{createTexreg}},
 #'   \code{\link[bizicount]{bizicount}}
@@ -250,9 +259,10 @@ extract.bizicount = function(model, CI=NULL, id=T){
 }
 
 #' @title The bizicount S4 Class
-#' @description Note that `bizicount` objects are, in general, S3. However,
-#' this S4 class is defined for compatability with \code{\link[texreg]{texreg}}.
-#' Interaction with `bizicount` objects should generally use S3 syntax.
+#' @description Note that `bizicount` objects are generally S3, and should use
+#'   S3 syntax. This S4 class is defined only for compatability with
+#'   \code{\link[texreg]{texreg}}. However, the contents of `bizicount` objects
+#'   is the same in both S3 and S4, so the descriptions below apply in both cases.
 #' @slot coef Coefficients of the model
 #' @slot coef.nid Coefficients without margin IDs
 #' @slot coef.orig Coefficients prior to transformations, for Gaussian
@@ -334,11 +344,16 @@ setMethod(texreg::extract,
 #' @param seed Seed used for simulating from fitted model. If `NULL`, no seed is
 #'   set.
 #' @param ... Ignored.
-#' @return A length 2 list, with each entry containing a numeric \eqn{n \times
+#' @return A length 2 list, with each entry containing a numeric \eqn{n X
 #'   nsim} matrix for each margin of the bizicount model. Rows index
 #'   the observation, and columns index the simulated dataset number.
 #' @example inst/examples/simulate_bizicount_ex.R
+#'
+#' @references Florian Hartig (2022). DHARMa: Residual Diagnostics for
+#'   Hierarchical (Multi-Level / Mixed) Regression Models. R package version
+#'   0.4.5. https://CRAN.R-project.org/package=DHARMa
 #' @author John Niehaus
+#' @seealso \code{\link[DHARMa]{createDHARMa}}, \code{\link[DHARMa]{simulateResiduals}}
 #' @export
 simulate.bizicount = function(object, nsim=250, seed=123, ...){
      if(is.null(object$model))
@@ -438,6 +453,9 @@ simulate.bizicount = function(object, nsim=250, seed=123, ...){
 #' @param seed Random seed for simulating from fitted model.
 #' @param method See \code{\link[DHARMa]{createDHARMa}}.
 #' @example inst/examples/make_dharma_ex.R
+#' @references Florian Hartig (2022). DHARMa: Residual Diagnostics for
+#'   Hierarchical (Multi-Level / Mixed) Regression Models. R package version
+#'   0.4.5. https://CRAN.R-project.org/package=DHARMa
 #' @export
 make_DHARMa = function(object, nsim=250, seed=123, method="PIT"){
      if( !any(class(object) == "bizicount") )

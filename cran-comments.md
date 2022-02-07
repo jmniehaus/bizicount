@@ -1,15 +1,17 @@
 # Test Environments 
 
-* Local Ubuntu 20.04, R v4.1.2
-* Local Ubuntu 20.04, R devel
-* Local Windows 10 Pro, R v4.1.2
-* Local Windows 10 Pro, R-devel
-* Remote MacOS 10.13.6 High Sierra, CRAN's setup
+* Local Ubuntu 20.04, R-release
+* Local Windows 10 Pro, R-release
+* Remote MacOS 11 runner, R-release
+* Remote MacOS 11 runner, R-devel
+* Remote Ubuntu 20.04, R-release
+* Remote Ubuntu 20.04 R-devel
+* Win-builder, R-release
+* Win-builder, R-devel
 
 # R CMD check results
-0 errors, 0 warnings, and 1 notes. 
+0 errors | 0 warnings | 1 note 
 
-## Explanation of 1 note 
 This note occurs because this is a new package. 
 
 # Revdep results 

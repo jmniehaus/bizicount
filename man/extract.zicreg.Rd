@@ -7,9 +7,10 @@
 \method{extract}{zicreg}(model, CI = NULL, id = T)
 }
 \arguments{
-\item{model}{A zicreg model object (S3).}
+\item{model}{A zicreg model object, returned by \code{\link{zic.reg}}.}
 
-\item{CI}{The two-tailed confidence level, if desired in the texreg object.}
+\item{CI}{The two-tailed confidence level, if desired in the resulting
+\code{\link[texreg]{texreg}} object.}
 
 \item{id}{Logical indicating whether to prepend equation identifiers to
 coefficient names (\code{ct_} for count parameters, \code{zi_} for zero-inflated parameters)}
@@ -17,12 +18,13 @@ coefficient names (\code{ct_} for count parameters, \code{zi_} for zero-inflated
 \value{
 A \code{\link[texreg]{texreg-class}} object, as produced by
 \code{\link[texreg]{createTexreg}}, which can interface with all of that
-package's methods.
+package's generics. See 'Examples.'
 }
 \description{
 This is a method for the \code{\link[texreg]{extract}} generic
-to be used with \code{\link{zicreg-class}} objects that are output from the
-\code{\link{zic.reg}} function.
+to be used with objects that are output from the \code{\link{zic.reg}}
+function. The results can then interface with the
+\code{\link[texreg]{texreg-package}}, as shown in examples below.
 }
 \examples{
 # Simulate some zip data
@@ -58,6 +60,11 @@ texreg::texreg(list(tr_obj_se, tr_obj_ci))
 
 texreg::screenreg(tr_obj_se)
 texreg::screenreg(tr_obj_ci)
+}
+\references{
+Leifeld, Philip (2013). texreg: Conversion of Statistical Model
+Output in R to LaTeX and HTML Tables. Journal of Statistical Software,
+55(8), 1-24. URL http://dx.doi.org/10.18637/jss.v055.i08.
 }
 \seealso{
 \code{\link[texreg]{extract}}, \code{\link[texreg]{createTexreg}},

@@ -29,7 +29,7 @@ second margins, respectively. If non-inflated, of the form \code{y ~ x_1 + x_2 +
 covariates for count parameters, and \code{z} are covariates for zero-inflated
 parameters in each margin. All covariates can be the same.}
 
-\item{data}{A dataframe containing the response variables, covariates, and
+\item{data}{A \code{\link[base]{data.frame}} containing the response variables, covariates, and
 offsets for the model. If \code{NULL}, these quantities are searched for in the
 parent environment.}
 
@@ -43,8 +43,7 @@ corresponding formula (i.e., zero-inflated margins with zero-inflated
 formulas).}
 
 \item{link.ct}{Length 2 character string specifying the link function used
-for the count portion of each margin (if zero-inflated, otherwise it is the
-link function for the conditional mean). One of \code{c("log", "identity", "sqrt")}.}
+for the count portion of each margin. One of \code{c("log", "identity", "sqrt")}.}
 
 \item{link.zi}{Length 2 character string specifying the link function used
 for the zero-inflation portion of each margin. One of \code{c("logit", "probit", "cauchit", "log", "cloglog")}. Ignored if corresponding \code{margins} entry is
@@ -56,38 +55,38 @@ If \code{NULL}, starting values are obtained automatically by a univariate regre
 
 \item{keep}{Logical indicating whether to keep the model matrix in the
 returned model object. Defaults to \code{FALSE} to conserve memory. NOTE: This
-must be set to \code{TRUE} to use \code{\link[texreg]{texreg}} or \code{\link{make_DHARMa}} functions with
-\code{bizicount} objects.}
+must be set to \code{TRUE} to usethe  \code{\link[texreg]{texreg}},
+\code{\link{simulate.bizicount}}, \code{\link[stats]{fitted}}, or
+\code{\link{make_DHARMa}} functions with \code{bizicount} objects.}
 
-\item{subset}{an optional vector specifying a subset of observations to be
-used in the fitting process.}
+\item{subset}{A vector indicating the subset of observations to use in
+estimation.}
 
 \item{na.action}{A function which indicates what should happen when the data
-contain NAs. The default is set by the na.action setting of options, and is
-na.fail if that is unset. The ‘factory-fresh’ default is na.omit. Another
-possible value is NULL, no action. Value na.exclude can be useful.}
+contain NAs. Default is \code{\link[stats]{na.omit}}.}
 
 \item{weights}{An optional numeric vector of weights for each observation.}
 
 \item{frech.min}{Lower boundary for Frechet-Hoeffding bounds on copula CDF.
 Used for computational purposes to prevent over/underflow in likelihood
-search. Must be in \eqn{[0, 1e-5]}, with \eqn{0} imposing no bound. See
-'Details.'}
+search. Must be in \eqn{[0, 1e-5]}, with \eqn{0} imposing the original FH
+bounds without computational consideration. See 'Details.'}
 
 \item{pmf.min}{Lower boundary on copula PMF evaluations. Used for
 computational purposes to prevent over/underflow in likelihood search. Must
-be in \eqn{[0, 1e-5]}, with \eqn{0} imposing no bound. See Details.'}
+be in \eqn{[0, 1e-5]}, with \eqn{0} imposing no bound. See `Details.'}
 
 \item{...}{Additional arguments to be passed on to the quasi-newton fitting
 function, \code{\link[stats]{nlm}}. See 'Details' for some parameters that
 may be useful to alter.}
 }
 \value{
-An S3 object (and list) of class '\code{bizicount}'.
+A list, which is an S3 \code{bizicount-class} object. See link for
+details on object's contents.
 }
 \description{
-The main bivariate regression function of the '\code{bizicount}'
-package. Estimates copula-based bivariate zero-inflated (and non-inflated)
+The main bivariate regression function of the \code{\link{bizicount-package}}
+Estimates copula-based bivariate zero-inflated (and non-inflated)
 count models via maximum likelihood. Supports the Frank and Gaussian
 copulas, as well as zero-inflated Poisson and negative binomial margins
 (and their non-inflated counterparts). It's class has associated
@@ -112,16 +111,17 @@ follows:
 Thus, in general count parameters should come first, followed by
 zero-inflation parameters, and finally inverse dispersion parameters.
 
-\item \code{frech.min} --Frechet (1951) and Hoeffding (1940) showed that
-copula CDFs have bounds of the form \eqn{max{u + v - 1, 0} \le C(u, v) \le
-min{u, v}}, where \eqn{u} and \eqn{v} are uniform realizations derived from
-the probability integral transform. Due to numerical underflow, very small
-values of \eqn{u} and \eqn{v} can be rounded to zero. Particularly when
-evaluating the Gaussian copula CDF this is problematic, ultimately leading to
-infinite-valued likelihood evaluations. Therefore, we impose
-Frechet-Hoeffding bounds numerically as \eqn{max{u + v - 1, frech.min} \le
-C(u, v) \le min{u, v, 1 - frech.min}}. NOTE: Setting this to 0 imposes the
-original Frechet bounds mentioned above.
+\item \code{frech.min} -- Changing this argument should almost never be
+necessary. Frechet (1951) and Hoeffding (1940) showed that copula CDFs have
+bounds of the form \eqn{max{u + v - 1, 0} \le C(u, v) \le min{u, v}}, where
+\eqn{u} and \eqn{v} are uniform realizations derived from the probability
+integral transform. Due to numerical underflow, very small values of \eqn{u}
+and \eqn{v} can be rounded to zero. Particularly when evaluating the Gaussian
+copula CDF this is problematic, ultimately leading to infinite-valued
+likelihood evaluations. Therefore, we impose Frechet-Hoeffding bounds
+numerically as \eqn{max{u + v - 1, frech.min} \le C(u, v) \le min{u, v, 1 -
+frech.min}}. NOTE: Setting this to 0 imposes the original Frechet bounds
+mentioned above.
 
 \item \code{pmf.min} -- Changing this argument should almost never be
 necessary. Observations can have likelihoods that are extremely close to 0.
@@ -131,6 +131,18 @@ from below at \code{pmf.min}.
 
 }
 }
+\section{Useful NLM parameters}{
+
+
+Sometimes it may be useful to alter \code{\link[stats]{nlm}}'s default
+parameters. The two that seem to benefit the fitting process the most are
+\code{stepmax} and \code{steptol}. Readers are referred to the documentation on
+\code{\link[stats]{nlm}} for more details on these parameters. It can be
+useful to lower \code{stepmax} particularly when the Hessian is not negative
+definite at convergence, sometimes to a value between 0 and 1. It can also be
+beneficial to increase \code{steptol}.
+}
+
 \examples{
 ### bizicount example
 
@@ -218,6 +230,28 @@ mod = bizicount(f1, f2, dat, cop = "g", margins = c("zinb", "zip"), keep=TRUE)
 
 print(mod)
 summary(mod)
+}
+\references{
+Genest C, Nešlehová J (2007). “A primer on copulas for count
+data.” ASTIN Bulletin: The Journal of the IAA, 37(2), 475–515.
+
+Inouye DI, Yang E, Allen GI, Ravikumar P (2017). “A review of multivariate
+distributions for count data derived from the Poisson distribution.” Wiley
+Interdisciplinary Reviews: Computational Statistics, 9(3).
+
+Joe H (1997). Multivariate models and multivariate dependence concepts. CRC Press.
+
+Nikoloulopoulos A (2013). “Copula-Based Models for Multivariate Discrete
+Response Data.” In P Jaworski, F Durante, WK Härdle (eds.), Copulae in
+Mathematical and Quantitative Finance, chapter 11, pp. 231–250. Springer.
+
+Nelsen RB (2007). An Introduction to Copulas. Springer Science & Business Media.
+
+Trivedi P, Zimmer D (2017). “A note on identification of bivariate copulas
+for discrete countdata.” Econometrics, 5(1), 10.
+
+Trivedi PK, Zimmer DM (2007). Copula modeling: an introduction for
+practitioners. NowPublishers Inc.
 }
 \author{
 John Niehaus

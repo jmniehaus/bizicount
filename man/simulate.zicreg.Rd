@@ -24,7 +24,7 @@ observations, and columns indexing the simulation number.
 \description{
 Simulates responses using the fitted parameters from a
 \code{\link{zicreg-class}} object, as returned by \code{\link{zic.reg}}.
-Primarily useful for methods found in \code{\link[DHARMa]{DHARMa}} package.
+Primarily useful for methods found in \code{\link[DHARMa]{DHARMa}} package. See 'Examples.'
 }
 \examples{
 # Simulate some zip data
@@ -59,6 +59,11 @@ dharm = DHARMa::createDHARMa(
 ### Plot the DHARMa object, do other diagnostics
 plot(dharm)
 DHARMa::testResiduals(dharm)
+}
+\references{
+Florian Hartig (2022). DHARMa: Residual Diagnostics for
+Hierarchical (Multi-Level / Mixed) Regression Models. R package version
+0.4.5. https://CRAN.R-project.org/package=DHARMa
 }
 \author{
 John Niehaus

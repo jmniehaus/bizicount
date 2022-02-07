@@ -86,7 +86,7 @@ vcov.zicreg = function(object, ...)
 #'   regression model
 #' @description Simulates responses using the fitted parameters from a
 #'   \code{\link{zicreg-class}} object, as returned by \code{\link{zic.reg}}.
-#'   Primarily useful for methods found in \code{\link[DHARMa]{DHARMa}} package.
+#'   Primarily useful for methods found in \code{\link[DHARMa]{DHARMa}} package. See 'Examples.'
 #' @param object A \code{\link{zicreg-class}} omodel bject, as returned by \code{\link{zic.reg}}.
 #' @param nsim Number of simulated datasets to create.
 #' @param seed Random seed for random number generation in simulations. If
@@ -95,6 +95,9 @@ vcov.zicreg = function(object, ...)
 #' @returns A numeric \eqn{n x nsim} matrix, with rows indexing
 #'   observations, and columns indexing the simulation number.
 #' @example /inst/examples/simulate_zicreg_ex.R
+#' @references Florian Hartig (2022). DHARMa: Residual Diagnostics for
+#'   Hierarchical (Multi-Level / Mixed) Regression Models. R package version
+#'   0.4.5. https://CRAN.R-project.org/package=DHARMa
 #' @author John Niehaus
 simulate.zicreg = function(object, nsim = 250, seed=123, ...) {
   if (is.null(object$model))
@@ -297,23 +300,32 @@ predict.zicreg = function(object,
 
 }
 
+
 # Function for texregging output
 #' @name extract.zicreg
 #' @title Texreg for zicreg objects
 #' @description This is a method for the \code{\link[texreg]{extract}} generic
-#'   to be used with \code{\link{zicreg-class}} objects that are output from the
-#'   \code{\link{zic.reg}} function.
+#'   to be used with objects that are output from the \code{\link{zic.reg}}
+#'   function. The results can then interface with the
+#'   \code{\link[texreg]{texreg-package}}, as shown in examples below.
 #' @method extract zicreg
-#' @param model A zicreg model object (S3).
-#' @param CI The two-tailed confidence level, if desired in the texreg object.
+#' @param model A zicreg model object, returned by \code{\link{zic.reg}}.
+#' @param CI The two-tailed confidence level, if desired in the resulting
+#'   \code{\link[texreg]{texreg}} object.
 #' @param id Logical indicating whether to prepend equation identifiers to
 #'   coefficient names (`ct_` for count parameters, `zi_` for zero-inflated parameters)
 #' @return A \code{\link[texreg]{texreg-class}} object, as produced by
 #'   \code{\link[texreg]{createTexreg}}, which can interface with all of that
-#'   package's methods.
+#'   package's generics. See 'Examples.'
 #' @author John Niehaus
 #' @seealso \code{\link[texreg]{extract}}, \code{\link[texreg]{createTexreg}},
 #'   \code{\link[bizicount]{zic.reg}}
+#'
+#' @references Leifeld, Philip (2013). texreg: Conversion of Statistical Model
+#'   Output in R to LaTeX and HTML Tables. Journal of Statistical Software,
+#'   55(8), 1-24. URL http://dx.doi.org/10.18637/jss.v055.i08.
+#'
+#'
 #' @example /inst/examples/extract_zicreg_ex.R
 #' @export
 extract.zicreg = function(model, CI = NULL, id = T) {

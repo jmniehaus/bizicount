@@ -18,12 +18,18 @@ coefficient names (\code{ct_} for count parameters, \code{zi_} for zero-inflated
 \value{
 A \code{\link[texreg]{texreg-class}} object, as produced by
 \code{\link[texreg]{createTexreg}}, which can interface with all of that
-package's methods.
+package's generics.
 }
 \description{
 This is a method for the \code{\link[texreg]{extract}} generic
-to be used with \code{\link{bizicount-class}} objects that are output from the
-\code{\link{bizicount}} function.
+to be used with objects that are output from the \code{\link{bizicount}}
+function. The results can be used with any of the
+\code{\link[texreg]{texreg-package}} generics.
+}
+\note{
+Users can typically just call \code{\link[texreg]{texreg}} directly on
+a \code{\link{bizicount-class}} object, instead of first extracting and
+then calling texreg.
 }
 \examples{
 ## SETUP
@@ -121,6 +127,11 @@ texreg::texreg(c(tr_obj_se, tr_obj_ci))
 # output as plaintext, two tables
 texreg::screenreg(tr_obj_se)
 texreg::screenreg(tr_obj_ci)
+}
+\references{
+Leifeld, Philip (2013). texreg: Conversion of Statistical Model
+Output in R to LaTeX and HTML Tables. Journal of Statistical Software,
+55(8), 1-24. URL http://dx.doi.org/10.18637/jss.v055.i08.
 }
 \seealso{
 \code{\link[texreg]{extract}}, \code{\link[texreg]{createTexreg}},

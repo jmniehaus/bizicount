@@ -20,7 +20,7 @@ set.}
 \item{...}{Ignored.}
 }
 \value{
-A length 2 list, with each entry containing a numeric \eqn{n \times
+A length 2 list, with each entry containing a numeric \eqn{n X
   nsim} matrix for each margin of the bizicount model. Rows index
 the observation, and columns index the simulated dataset number.
 }
@@ -142,6 +142,14 @@ DHARMa::testResiduals(d1)
 DHARMa::testResiduals(d2)
 
 
+}
+\references{
+Florian Hartig (2022). DHARMa: Residual Diagnostics for
+Hierarchical (Multi-Level / Mixed) Regression Models. R package version
+0.4.5. https://CRAN.R-project.org/package=DHARMa
+}
+\seealso{
+\code{\link[DHARMa]{createDHARMa}}, \code{\link[DHARMa]{simulateResiduals}}
 }
 \author{
 John Niehaus

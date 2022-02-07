@@ -17,11 +17,11 @@
 #'
 #' @description The package provides regression functions for copula-based
 #'   bivariate count models, with and without zero-inflation, as well as
-#'   univariate zero-inflated count models. Generic methods from
-#'   \code{\link[texreg]{texreg-package}} and \code{\link[DHARMa]{DHARMa}} are
-#'   extended to support the classes from this package, namely for the purposes
-#'   of producing professional tables, and carrying out post-estimation
-#'   diagnostics.
+#'   regression functions for univariate zero-inflated count models. Generic
+#'   methods from the \code{\link[texreg]{texreg-package}} and
+#'   \code{\link[DHARMa]{DHARMa}} are extended to support this
+#'   package, namely for the purposes of producing professional tables and
+#'   carrying out post-estimation diagnostics.
 #'
 #' @section Bivariate Functions:
 #'
@@ -37,11 +37,12 @@
 #' for each margin, for use with that package's other functions.
 #'
 #' \item \code{\link{make_DHARMa}} -- Creates a list of DHARMa objects, one for
-#' each margin, for bizicount objects. A wrapper around
+#' each margin, for \code{\link{bizicount}} models. A wrapper around
 #' \code{\link[DHARMa]{createDHARMa}}.
 #'
 #' \item \code{\link{simulate.bizicount}} -- Method that simulates observations
 #' using the fitted model's parameters, primarily for use with DHARMa.
+#'
 #'
 #' }
 #'
@@ -61,7 +62,7 @@
 #'
 #' }
 #'
-#'
+#' @author John Niehaus
 #' @docType package
 #' @name bizicount-package
 

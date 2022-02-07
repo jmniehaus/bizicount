@@ -4,8 +4,8 @@
 #' @title Bizicount: Maximum likelihood estimation of copula-based bivariate zero-inflated
 #'   (and non-inflated) count models
 #'
-#' @description The main bivariate regression function of the '\code{bizicount}'
-#'   package. Estimates copula-based bivariate zero-inflated (and non-inflated)
+#' @description The main bivariate regression function of the \code{\link{bizicount-package}}
+#'   Estimates copula-based bivariate zero-inflated (and non-inflated)
 #'   count models via maximum likelihood. Supports the Frank and Gaussian
 #'   copulas, as well as zero-inflated Poisson and negative binomial margins
 #'   (and their non-inflated counterparts). It's class has associated
@@ -30,16 +30,17 @@
 #'  Thus, in general count parameters should come first, followed by
 #'  zero-inflation parameters, and finally inverse dispersion parameters.
 #'
-#' \item \code{frech.min} --Frechet (1951) and Hoeffding (1940) showed that
-#' copula CDFs have bounds of the form \eqn{max{u + v - 1, 0} \le C(u, v) \le
-#' min{u, v}}, where \eqn{u} and \eqn{v} are uniform realizations derived from
-#' the probability integral transform. Due to numerical underflow, very small
-#' values of \eqn{u} and \eqn{v} can be rounded to zero. Particularly when
-#' evaluating the Gaussian copula CDF this is problematic, ultimately leading to
-#' infinite-valued likelihood evaluations. Therefore, we impose
-#' Frechet-Hoeffding bounds numerically as \eqn{max{u + v - 1, frech.min} \le
-#' C(u, v) \le min{u, v, 1 - frech.min}}. NOTE: Setting this to 0 imposes the
-#' original Frechet bounds mentioned above.
+#' \item \code{frech.min} -- Changing this argument should almost never be
+#' necessary. Frechet (1951) and Hoeffding (1940) showed that copula CDFs have
+#' bounds of the form \eqn{max{u + v - 1, 0} \le C(u, v) \le min{u, v}}, where
+#' \eqn{u} and \eqn{v} are uniform realizations derived from the probability
+#' integral transform. Due to numerical underflow, very small values of \eqn{u}
+#' and \eqn{v} can be rounded to zero. Particularly when evaluating the Gaussian
+#' copula CDF this is problematic, ultimately leading to infinite-valued
+#' likelihood evaluations. Therefore, we impose Frechet-Hoeffding bounds
+#' numerically as \eqn{max{u + v - 1, frech.min} \le C(u, v) \le min{u, v, 1 -
+#' frech.min}}. NOTE: Setting this to 0 imposes the original Frechet bounds
+#' mentioned above.
 #'
 #' \item \code{pmf.min} -- Changing this argument should almost never be
 #' necessary. Observations can have likelihoods that are extremely close to 0.
@@ -49,9 +50,41 @@
 #'
 #' }
 #'
+#' @section Useful NLM parameters:
+#'
+#' Sometimes it may be useful to alter \code{\link[stats]{nlm}}'s default
+#' parameters. The two that seem to benefit the fitting process the most are
+#' `stepmax` and `steptol`. Readers are referred to the documentation on
+#' \code{\link[stats]{nlm}} for more details on these parameters. It can be
+#' useful to lower `stepmax` particularly when the Hessian is not negative
+#' definite at convergence, sometimes to a value between 0 and 1. It can also be
+#' beneficial to increase `steptol`.
+#'
+#' @references Genest C, Nešlehová J (2007). “A primer on copulas for count
+#'   data.” ASTIN Bulletin: The Journal of the IAA, 37(2), 475–515.
+#'
+#'   Inouye DI, Yang E, Allen GI, Ravikumar P (2017). “A review of multivariate
+#'   distributions for count data derived from the Poisson distribution.” Wiley
+#'   Interdisciplinary Reviews: Computational Statistics, 9(3).
+#'
+#'   Joe H (1997). Multivariate models and multivariate dependence concepts. CRC Press.
+#'
+#'   Nikoloulopoulos A (2013). “Copula-Based Models for Multivariate Discrete
+#'   Response Data.” In P Jaworski, F Durante, WK Härdle (eds.), Copulae in
+#'   Mathematical and Quantitative Finance, chapter 11, pp. 231–250. Springer.
+#'
+#'   Nelsen RB (2007). An Introduction to Copulas. Springer Science & Business Media.
+#'
+#'   Trivedi P, Zimmer D (2017). “A note on identification of bivariate copulas
+#'   for discrete countdata.” Econometrics, 5(1), 10.
+#'
+#'   Trivedi PK, Zimmer DM (2007). Copula modeling: an introduction for
+#'   practitioners. NowPublishers Inc.
+#'
 #' @example inst/examples/bizicount_ex.R
 #'
-#' @return An S3 object (and list) of class '\code{bizicount}'.
+#' @return A list, which is an S3 \code{bizicount-class} object. See link for
+#' details on object's contents.
 #'
 #'
 #'
@@ -61,7 +94,7 @@
 #'   ... + z_p`, where `y` is the outcome for the first margin, `x` are
 #'   covariates for count parameters, and `z` are covariates for zero-inflated
 #'   parameters in each margin. All covariates can be the same.
-#' @param data A dataframe containing the response variables, covariates, and
+#' @param data A \code{\link[base]{data.frame}} containing the response variables, covariates, and
 #'   offsets for the model. If `NULL`, these quantities are searched for in the
 #'   parent environment.
 #' @param cop Character string specifying the copula to be used. One of
@@ -72,8 +105,7 @@
 #'   corresponding formula (i.e., zero-inflated margins with zero-inflated
 #'   formulas).
 #' @param link.ct Length 2 character string specifying the link function used
-#'   for the count portion of each margin (if zero-inflated, otherwise it is the
-#'   link function for the conditional mean). One of `c("log", "identity",
+#'   for the count portion of each margin. One of `c("log", "identity",
 #'   "sqrt")`.
 #' @param link.zi Length 2 character string specifying the link function used
 #'   for the zero-inflation portion of each margin. One of `c("logit", "probit",
@@ -84,22 +116,21 @@
 #'   If `NULL`, starting values are obtained automatically by a univariate regression fit.
 #' @param keep Logical indicating whether to keep the model matrix in the
 #'   returned model object. Defaults to `FALSE` to conserve memory. NOTE: This
-#'   must be set to `TRUE` to use \code{\link[texreg]{texreg}} or \code{\link{make_DHARMa}} functions with
-#'   `bizicount` objects.
-#' @param subset an optional vector specifying a subset of observations to be
-#'   used in the fitting process.
+#'   must be set to `TRUE` to usethe  \code{\link[texreg]{texreg}},
+#'   \code{\link{simulate.bizicount}}, \code{\link[stats]{fitted}}, or
+#'   \code{\link{make_DHARMa}} functions with `bizicount` objects.
+#' @param subset A vector indicating the subset of observations to use in
+#' estimation.
 #' @param na.action A function which indicates what should happen when the data
-#'   contain NAs. The default is set by the na.action setting of options, and is
-#'   na.fail if that is unset. The ‘factory-fresh’ default is na.omit. Another
-#'   possible value is NULL, no action. Value na.exclude can be useful.
+#'   contain NAs. Default is \code{\link[stats]{na.omit}}.
 #' @param weights An optional numeric vector of weights for each observation.
 #' @param frech.min Lower boundary for Frechet-Hoeffding bounds on copula CDF.
 #'   Used for computational purposes to prevent over/underflow in likelihood
-#'   search. Must be in \eqn{[0, 1e-5]}, with \eqn{0} imposing no bound. See
-#'   'Details.'
+#'   search. Must be in \eqn{[0, 1e-5]}, with \eqn{0} imposing the original FH
+#'   bounds without computational consideration. See 'Details.'
 #' @param pmf.min Lower boundary on copula PMF evaluations. Used for
 #'   computational purposes to prevent over/underflow in likelihood search. Must
-#'   be in \eqn{[0, 1e-5]}, with \eqn{0} imposing no bound. See Details.'
+#'   be in \eqn{[0, 1e-5]}, with \eqn{0} imposing no bound. See `Details.'
 #' @param ... Additional arguments to be passed on to the quasi-newton fitting
 #'   function, \code{\link[stats]{nlm}}. See 'Details' for some parameters that
 #'   may be useful to alter.
