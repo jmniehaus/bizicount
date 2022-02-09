@@ -48,17 +48,18 @@
 #' results in an infinite likelihood. To avoid this, we bound PMF evaluations
 #' from below at \code{pmf.min}.
 #'
-#' }
-#'
-#' @section Useful NLM parameters:
-#'
-#' Sometimes it may be useful to alter \code{\link[stats]{nlm}}'s default
-#' parameters. The two that seem to benefit the fitting process the most are
+#' \item `...` -- Sometimes it may be useful to alter \code{\link[stats]{nlm}}'s
+#' default parameters. This can be done by simply passing those arguments into
+#' `bizicount()`. The two that seem to benefit the fitting process the most are
 #' `stepmax` and `steptol`. Readers are referred to the documentation on
 #' \code{\link[stats]{nlm}} for more details on these parameters. It can be
 #' useful to lower `stepmax` particularly when the Hessian is not negative
 #' definite at convergence, sometimes to a value between 0 and 1. It can also be
 #' beneficial to increase `steptol`.
+#'
+#' }
+#'
+#'
 #'
 #' @references Genest C, Nešlehová J (2007). “A primer on copulas for count
 #'   data.” ASTIN Bulletin: The Journal of the IAA, 37(2), 475–515.
@@ -83,8 +84,38 @@
 #'
 #' @example inst/examples/bizicount_ex.R
 #'
-#' @return A list, which is an S3 \code{bizicount-class} object. See link for
-#' details on object's contents.
+#' @return An S3 \code{\link{bizicount-class}} object, which is a list containing:
+#' \itemize{
+#' \item `coef` -- Coefficients of the model
+#' \item `coef.nid` -- Coefficients without margin IDs
+#' \item `coef.orig` -- Coefficients prior to transformations, for Gaussian
+#'   dependence and negative binomial dispersion.
+#' \item `coef.orig.nid` -- Coefficients prior to transforms, no margin IDs.
+#' \item `se` -- Asymptotic normal-theory standard errors based on observed Fisher Information
+#' \item `se.nid` -- Standard errors without margin IDs
+#' \item `z` -- z-scores for parameter estimates
+#' \item `z.nid` -- z-scores without margin IDs
+#' \item `p` -- p-values for parameter estimates
+#' \item `p.nid` -- p-values without margin IDs
+#' \item `coefmats` -- A list containing coeficient matrices for each margin
+#' \item `loglik` -- Scalar log-likelihood at convergence
+#' \item `grad` -- Numerical gradient vector at convergence
+#' \item `n.iter` -- Number of quasi-newton fitting iterations.
+#' \item `covmat` -- Covariance matrix of parameter estimates based on observed Fisher Information
+#' \item `aic` -- Model's Akaike information
+#' \item `bic` -- Model's Bayesian information criterion
+#' \item `nobs` -- Number of observations
+#' \item `margins` -- Marginal distributions used in fitting
+#' \item `link.zi, link.ct` -- Names of link functions used in fitting
+#' \item `invlink.ct, invlink.zi` -- Inverse link functions used in fitting (the
+#'   actual function, not their names)
+#' \item `outcomes` -- Name of the response vector
+#' \item `conv` -- Integer telling convergence status in nlm. See ?nlm.
+#' \item `cop` -- The copula used in fitting
+#' \item `starts` -- list of starting values used
+#' \item `call` -- The model's call
+#' \item `model` -- List containing model matrices, or `NULL` if `keep = F`.
+#' }
 #'
 #'
 #'
@@ -140,34 +171,34 @@
 #'
 #' @export
 bizicount = function(fmla1,
-                    fmla2,
-                    data,
-                    cop = "gaus",
-                    margins = c("pois", "pois"),
-                    link.ct = c("log", "log"),
-                    link.zi = c("logit", "logit"),
-                    starts = NULL,
-                    keep = F,
-                    subset,
-                    na.action,
-                    weights,
-                    frech.min = 1e-7,
-                    pmf.min = 1e-7,
-                    ...) {
+                     fmla2,
+                     data,
+                     cop = "gaus",
+                     margins = c("pois", "pois"),
+                     link.ct = c("log", "log"),
+                     link.zi = c("logit", "logit"),
+                     starts = NULL,
+                     keep = FALSE,
+                     subset,
+                     na.action,
+                     weights,
+                     frech.min = 1e-7,
+                     pmf.min = 1e-7,
+                     ...) {
   #some arg checking
   check_biv_args()
 
   # Bivariate likelihood (univariate is lower down)
-  cop.lik = function(parms){
-
-    ct = lapply(ct.ind, function(x) parms[x])
+  cop.lik = function(parms) {
+    ct = lapply(ct.ind, function(x)
+      parms[x])
 
 
     # Loop over inputs to create list of marginal lambdas
     # ie, lam[1] = f1(x1, z1, w1), lam[2] = f2(x2, z2, w2)
     lam = mapply(
-      function(par, design, offset, invlink){
-        if(ncol(design) == 1)
+      function(par, design, offset, invlink) {
+        if (ncol(design) == 1)
           as.vector(invlink(design * par + offset))
         else
           as.vector(invlink(design %*% par + offset))
@@ -183,8 +214,9 @@ bizicount = function(fmla1,
     zi = list()
     if (n.zi == 1)
       zi[[zipos]] = parms[zi.ind[[zipos]]]
-    if (n.zi == 2){
-      zi = lapply(zi.ind, function(x) parms[x])
+    if (n.zi == 2) {
+      zi = lapply(zi.ind, function(x)
+        parms[x])
     }
 
     # dispersion and dependence params
@@ -202,8 +234,8 @@ bizicount = function(fmla1,
 
     # Create list of zero-inflation probability vectors
     psi = list()
-    if(n.zi > 0){
-      for(i in zipos)
+    if (n.zi > 0) {
+      for (i in zipos)
         psi[[i]] = as.vector(invlink.zi[[i]](Z[[i]] %*% zi[[i]] + offset.zi[[i]]))
     }
 
@@ -214,10 +246,8 @@ bizicount = function(fmla1,
     for (i in c(1, 2)) {
       margin.args[[i]] = switch(
         margins[i],
-        "pois" = list(
-          q      = y[, i],
-          lambda = lam[[i]]
-        ),
+        "pois" = list(q      = y[, i],
+                      lambda = lam[[i]]),
         "nbinom"  = list(
           q     = y[, i],
           mu    = lam[[i]],
@@ -252,16 +282,14 @@ bizicount = function(fmla1,
     # bound likelihoods for logging
     d = bound(d * weights, low = pmf.min)
 
+
     #ll
+
     -sum(log(d))
 
   }
 
   starts.marginal = function() {
-    oldwarn = getOption("warn")
-    options(warn = -1)
-    on.exit(options(warn = oldwarn), add = T)
-
     if (!env_has(e.check, "univ.check")) {
       env_poke(e.check, "univ.check", T)
       on.exit(rm("univ.check", envir = e.check), add = T)
@@ -271,7 +299,7 @@ bizicount = function(fmla1,
 
     for (i in 1:2) {
       i = as.numeric(i)
-      mod <- switch(
+      mod <- suppressWarnings(switch(
         margins[i],
         "pois"   =
           glm.fit(
@@ -294,26 +322,31 @@ bizicount = function(fmla1,
           )
         ))),
         "zinb"   =
-          zic.reg(y=y[,i], X=X[[i]], z=Z[[i]],
-                  offset.ct = offset.ct[[i]],
-                  offset.zi=offset.zi[[i]],
-                  weights = weights,
-                  dist = "nbinom",
-                  link.zi = link.zi[i],
-                  link.ct = link.ct[i],
-                  gradtol = 1e-4
+          zic.reg(
+            y = y[, i],
+            X = X[[i]],
+            z = Z[[i]],
+            offset.ct = offset.ct[[i]],
+            offset.zi = offset.zi[[i]],
+            weights = weights,
+            dist = "nbinom",
+            link.zi = link.zi[i],
+            link.ct = link.ct[i],
+            gradtol = 1e-4
           ),
         "zip"    =
           zic.reg(
-            y=y[,i], X=X[[i]], z=Z[[i]],
+            y = y[, i],
+            X = X[[i]],
+            z = Z[[i]],
             offset.ct = offset.ct[[i]],
-            offset.zi=offset.zi[[i]],
+            offset.zi = offset.zi[[i]],
             dist = "pois",
             link.zi = link.zi[i],
             link.ct = link.ct[i],
             gradtol = 1e-4
           )
-      )
+      ))
 
       if (grepl("nb", margins[i]))
         starts.disp[[i]] = mod$theta[1]
@@ -333,14 +366,15 @@ bizicount = function(fmla1,
       unlist(starts.disp),
       cor(y, method = "spearman")[1, 2]
     )))
-  }
-
+  } # end of starting values function
 
 
 
   cop     = match_arg(cop, c("frank", "gaus"))
   link.ct = match_arg(link.ct, c("sqrt", "identity", "log"), several.ok = T)
-  link.zi = match_arg(link.zi, c("logit", "probit", "cauchit", "log", "cloglog"), several.ok = T)
+  link.zi = match_arg(link.zi,
+                      c("logit", "probit", "cauchit", "log", "cloglog"),
+                      several.ok = T)
 
 
   # indices for getting parms/matrices etc from formulas
@@ -428,7 +462,7 @@ bizicount = function(fmla1,
   # Prevent arg checking in CDF to speed up likelihood evaluations by using counter
   # in e.check (environment.check)
   # (checking is done at beginning of this function, so nested checks are redundant)
-  if (!env_has(e.check, "zi.dens.checks")){
+  if (!env_has(e.check, "zi.dens.checks")) {
     env_poke(e.check, "zi.dens.checks", T)
     on.exit(rm("zi.dens.checks", envir = e.check), add = T)
   }
@@ -445,7 +479,7 @@ bizicount = function(fmla1,
 
   varargs$hessian = T
 
-  reg.inputs = c(list(f=cop.lik, p = starts), varargs)
+  reg.inputs = c(list(f = cop.lik, p = starts), varargs)
 
   ### main regression
   out = withCallingHandlers(
@@ -457,28 +491,31 @@ bizicount = function(fmla1,
 
   # use numDeriv to get hessian if there are issues with NLM's hessian, provided that the gradient is small, there were iterations
   # and neither the hessian nor gradient are exactly zero (in those situations, we don't want to get a hessian as there are bigger problems)
-    if(out$iterations > 1 &&
-     all(abs(out$gradient)  < .05) &&
-     !all(out$hessian == 0) &&
-     !all(out$gradient == 0) &&
-     anyNA(suppressWarnings(sqrt(diag(solve(out$hessian)))))
-     ){
-
-    warning("nlm() was unable to obtain Hessian matrix, so numDeriv::hessian() was used in computing standard errors.
+  if (out$iterations > 1 &&
+      all(abs(out$gradient)  < .05) &&
+      !all(out$hessian == 0) &&
+      !all(out$gradient == 0) &&
+      anyNA(suppressWarnings(sqrt(diag(
+        solve(out$hessian)
+      ))))) {
+    warning(
+      "nlm() was unable to obtain Hessian matrix, so numDeriv::hessian() was used in computing standard errors.
             Consider reducing 'stepmax' option to nlm to prevent this.
-            See `?nlm` for more details on the 'stepmax' option.")
-    out$hessian = numDeriv::hessian(cop.lik, out$estimate, method.args = list(r=6))
+            See `?nlm` for more details on the 'stepmax' option."
+    )
+    out$hessian = numDeriv::hessian(cop.lik, out$estimate, method.args = list(r = 6))
 
   }
 
   conv.message = "try adjusting stepmax. See '?nlm' Details --> Value --> Code for more information."
   switch(out$code,
-           invisible(NULL),
-           warning(paste("Convergence code 2", conv.message)),
-           warning(paste("Convergence code 3", conv.message)),
-           stop("Maximum iterations reached, increase `iterlim`. IE, add 'iterlim = [some large integer]' to function call."),
-           stop(paste("Convergence code 5", conv.message))
-  )
+         invisible(NULL),
+         warning(paste("Convergence code 2", conv.message)),
+         warning(paste("Convergence code 3", conv.message)),
+         stop(
+           "Maximum iterations reached, increase `iterlim`. IE, add 'iterlim = [some large integer]' to function call."
+         ),
+         stop(paste("Convergence code 5", conv.message)))
 
   # transform hessian with change of variables to get correct standard errors for
   # transformed parameters. only necessary if negative binomial margins or gaussian copula
@@ -498,13 +535,13 @@ bizicount = function(fmla1,
       dpr.inv = rev(1 / exp(tail(out$estimate, (n.nb + 1))[1:n.nb]))
       d = nrow(hess.mult)
 
-      hess.mult[d,] = thpr.inv # replace hess multiplier row d with 1/derivative of dependence
+      hess.mult[d, ] = thpr.inv # replace hess multiplier row d with 1/derivative of dependence
       hess.mult[, d] = hess.mult[, d] * thpr.inv # multiply hess multiplier col d by 1/deriv dependence
-      hess.mult[(d - 1),] = hess.mult[(d - 1),] * dpr.inv[1] # multiply second to last row of hess by 1/deriv disp.2 (recall use of rev())
+      hess.mult[(d - 1), ] = hess.mult[(d - 1), ] * dpr.inv[1] # multiply second to last row of hess by 1/deriv disp.2 (recall use of rev())
       hess.mult[, (d - 1)] = hess.mult[, (d - 1)] * dpr.inv[1]
 
       if (n.nb > 1) {
-        hess.mult[(d - 2) ,] = hess.mult[(d - 2) ,] * dpr.inv[2] #first dispersion transformation (recall use of rev())
+        hess.mult[(d - 2) , ] = hess.mult[(d - 2) , ] * dpr.inv[2] #first dispersion transformation (recall use of rev())
         hess.mult[, (d - 2)] = hess.mult[, (d - 2)] * dpr.inv[2]
       }
     }
@@ -517,10 +554,11 @@ bizicount = function(fmla1,
 
   # check that hessian of loglik is neg def
   evs = eigen(-hess.new, symmetric = T)$values
-  assert(all(evs <= sqrt(.Machine$double.eps) * abs(evs[1])),
-         "Hessian of loglik is not negative definite at convergence point; convergence point is not a maximum.",
-         type="warning"
-    )
+  assert(
+    all(evs <= sqrt(.Machine$double.eps) * abs(evs[1])),
+    "Hessian of loglik is not negative definite at convergence point; convergence point is not a maximum.",
+    type = "warning"
+  )
 
   #cleanup results for print
   beta = beta.orig = out$estimate
@@ -596,7 +634,8 @@ bizicount = function(fmla1,
       else
         NULL,
       names = colnames(y),
-      margins = lapply(margins, function(x) x)
+      margins = lapply(margins, function(x)
+        x)
     ),
     mapply(
       function(names, margins)
@@ -605,7 +644,8 @@ bizicount = function(fmla1,
       else
         NULL,
       names = colnames(y),
-      margins = lapply(margins, function(x) x)
+      margins = lapply(margins, function(x)
+        x)
     ),
     "dependence"
   ))
@@ -685,5 +725,3 @@ bizicount = function(fmla1,
   return(res)
 
 }
-
-

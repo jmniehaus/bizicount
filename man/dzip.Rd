@@ -7,13 +7,13 @@
 \alias{qzip}
 \title{The zero-inflated Poisson (ZIP) distribution}
 \usage{
-dzip(x, lambda, psi, log = F, recycle = F)
+dzip(x, lambda, psi, log = FALSE, recycle = FALSE)
 
-rzip(n, lambda, psi, recycle = F)
+rzip(n, lambda, psi, recycle = FALSE)
 
-pzip(q, lambda, psi, lower.tail = T, log.p = F, recycle = F)
+pzip(q, lambda, psi, lower.tail = TRUE, log.p = FALSE, recycle = FALSE)
 
-qzip(p, lambda, psi, lower.tail = T, log.p = F, recycle = F)
+qzip(p, lambda, psi, lower.tail = TRUE, log.p = FALSE, recycle = FALSE)
 }
 \arguments{
 \item{x, q}{Vector of quantiles at which to evaluate the PMF and CDF,
@@ -79,7 +79,8 @@ psi = .1
 dzip(x, lambda, psi)
 
 
-#unequal lengths, at least one of them is not length 1, so error.
+# unequal lengths, at least one of them is not length 1,
+# error
 
 \dontrun{
 

@@ -7,17 +7,20 @@
   <!-- badges: end -->
 
 The `bizicount` R-package is primarily for estimating copula-based bivariate 
-count regression models, with and without zero-inflation or overdispersion. 
-However, it also includes functions to do the following:
+count regression models, with and without zero-inflation or overdispersion. However,
+its full suite of functions can:
+
+* Estimate copula-based bivariate zero-inflated count regression models, as well as 
+non-inflated models. 
 
 * Estimate univariate zero-inflated count models (`zic.reg`)
-     
-* Evaluate univariate zero-inflated count distribution CDFs, PDFs, and quantile 
-functions, and generate random zero-inflated counts (`pzip` or `pzinb`, `dzip` or `dzinb`, `qzip` or `qzinb`, and `rzip` or `rzinb`)
      
 * Carry out post estimation diagnostics using the [`DHARMa`](https://github.com/florianhartig/DHARMa) package (`simulate.bizicount`, `simulate.zicreg`, `make_DHARMa`)
      
 * Produce professional tables in latex, word, or plain-text using the [`texreg`](https://github.com/leifeld/texreg) package (`extract.bizicount`, `extract.zicreg`). 
+
+* Evaluate univariate zero-inflated count distribution CDFs, PDFs, and quantile 
+functions, and generate random zero-inflated counts (`pzip` or `pzinb`, `dzip` or `dzinb`, `qzip` or `qzinb`, and `rzip` or `rzinb`)
      
 ## Installation
 

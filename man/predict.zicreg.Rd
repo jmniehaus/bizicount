@@ -22,6 +22,9 @@ the count portion of the mixture distribution. NOTE: Setting \code{type = "mean"
 
 \item{...}{Ignored.}
 }
+\value{
+A numeric vector containing the predictions using the model parameters.
+}
 \description{
 Predicts the mean, probability, count mean, or zero-inflation
 probability for new data using parameters from a fitted zero-inflated count

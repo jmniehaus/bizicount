@@ -4,7 +4,7 @@
 \alias{extract.zicreg}
 \title{Texreg for zicreg objects}
 \usage{
-\method{extract}{zicreg}(model, CI = NULL, id = T)
+\method{extract}{zicreg}(model, CI = NULL, id = TRUE)
 }
 \arguments{
 \item{model}{A zicreg model object, returned by \code{\link{zic.reg}}.}

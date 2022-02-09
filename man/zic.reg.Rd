@@ -90,8 +90,29 @@ base generics like \code{\link[stats]{fitted}} and
 \code{\link[stats]{nlm}} or \code{\link[stats]{optim}}. See 'Examples'.}
 }
 \value{
-An S3 \code{\link{zicreg-class}}, which is a list. See the link for
-details on it's contents.
+An S3 \code{\link{zicreg-class}} object, which is a list containing:
+\itemize{
+\item  \code{call} -- The original function call
+\item  \code{obj} -- The class of the object
+\item  \code{coef} -- Vector of coefficients, with count, then zi, then dispersion.
+\item  \code{se} -- Vector of asymptotic standard errors
+\item  \code{grad} -- Gradient vector at convergence
+\item  \code{link.ct} -- Name of link used for count portion
+\item  \code{link.zi} -- Name of link used for zero-inflated portion
+\item  \code{dist} -- Name of distribution used for count portion
+\item  \code{optimizer} -- Name of optimization package used in fitting
+\item  \code{coefmat.ct} -- Coefficient matrix for count portion
+\item  \code{coefmat.zi} -- Coefficient matrix for zero-inflated portion
+\item  \code{convergence} -- Convergence code from optimization routine.
+\item  \code{coefmat.all} -- Coefficient matrix for both parts of the model
+\item  \code{theta} -- Coefficient matrix for dispersion, if applicable.
+\item  \code{covmat} -- Asymptotic covariance matrix
+\item  \code{nobs} -- Number of observations
+\item  \code{aic} -- Akaike information
+\item  \code{bic} -- Bayes information
+\item  \code{loglik} -- Log-likelihood at convergence
+\item  \code{model} -- List containing model matrices if \code{keep = TRUE}
+}
 }
 \description{
 This function from the \code{\link{bizicount}} package estimates

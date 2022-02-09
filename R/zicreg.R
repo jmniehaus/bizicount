@@ -65,9 +65,32 @@
 #'
 #' @example /inst/examples/zicreg_ex.R
 #'
-#' @return An S3 \code{\link{zicreg-class}}, which is a list. See the link for
-#' details on it's contents.
+#' @return An S3 \code{\link{zicreg-class}} object, which is a list containing:
+#' \itemize{
+#' \item  `call` -- The original function call
+#' \item  `obj` -- The class of the object
+#' \item  `coef` -- Vector of coefficients, with count, then zi, then dispersion.
+#' \item  `se` -- Vector of asymptotic standard errors
+#' \item  `grad` -- Gradient vector at convergence
+#' \item  `link.ct` -- Name of link used for count portion
+#' \item  `link.zi` -- Name of link used for zero-inflated portion
+#' \item  `dist` -- Name of distribution used for count portion
+#' \item  `optimizer` -- Name of optimization package used in fitting
+#' \item  `coefmat.ct` -- Coefficient matrix for count portion
+#' \item  `coefmat.zi` -- Coefficient matrix for zero-inflated portion
+#' \item  `convergence` -- Convergence code from optimization routine.
+#' \item  `coefmat.all` -- Coefficient matrix for both parts of the model
+#' \item  `theta` -- Coefficient matrix for dispersion, if applicable.
+#' \item  `covmat` -- Asymptotic covariance matrix
+#' \item  `nobs` -- Number of observations
+#' \item  `aic` -- Akaike information
+#' \item  `bic` -- Bayes information
+#' \item  `loglik` -- Log-likelihood at convergence
+#' \item  `model` -- List containing model matrices if `keep = TRUE`
+#'}
+#'
 #' @author John Niehaus
+#'
 #' @references Lambert, Diane. "Zero-inflated Poisson regression, with an
 #'   application to defects in manufacturing." Technometrics 34.1 (1992): 1-14.
 #' @seealso \code{\link{simulate.zicreg}}, \code{\link{extract.zicreg}}

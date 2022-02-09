@@ -35,7 +35,7 @@ nobs.bizicount = function(object, ...) object$nobs
 vcov.bizicount = function(object, ...) object$covmat
 
 #' @export
-coef.bizicount = function(object, id=T, ...){
+coef.bizicount = function(object, id = TRUE, ...){
      if(id)
           return(object$coef)
      else
@@ -91,7 +91,7 @@ summary.bizicount = function(object, ...){
 }
 
 #' @export
-print.summary.bizicount = function(x, stars=T, ...){
+print.summary.bizicount = function(x, stars = TRUE, ...){
      old = getOption("show.signif.stars")
      options(show.signif.stars = stars)
      on.exit(options(show.signif.stars = old),
@@ -193,7 +193,7 @@ print.summary.bizicount = function(x, stars=T, ...){
 #' @seealso \code{\link[texreg]{extract}}, \code{\link[texreg]{createTexreg}},
 #'   \code{\link[bizicount]{bizicount}}
 #' @export
-extract.bizicount = function(model, CI=NULL, id=T){
+extract.bizicount = function(model, CI = NULL, id = TRUE){
      if(!is.null(CI) && (CI > 1 || CI < 0) ) stop("`CI` must be between 0 and 1. ")
      if(!is.logical(id)) stop("`id` must be logical (T/F) value.")
 

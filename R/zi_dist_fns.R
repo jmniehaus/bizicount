@@ -60,7 +60,7 @@
 #'   application to defects in manufacturing." Technometrics 34.1 (1992): 1-14.
 #'
 #' @export
-dzip = function(x, lambda, psi, log=F, recycle=F){
+dzip = function(x, lambda, psi, log = FALSE, recycle = FALSE){
 
   if(!env_has(e.check, "zi.dens.checks"))
     check_dist_args(recycle=recycle)
@@ -106,7 +106,7 @@ dzip = function(x, lambda, psi, log=F, recycle=F){
 # zi poisson rng ===============================================================
 #' @rdname dzip
 #' @export
-rzip = function(n, lambda, psi, recycle=F){
+rzip = function(n, lambda, psi, recycle = FALSE){
 
   check_dist_args(recycle=recycle)
 
@@ -135,7 +135,7 @@ rzip = function(n, lambda, psi, recycle=F){
 # zi poisson cdf ===============================================================
 #' @rdname dzip
 #' @export
-pzip = function(q, lambda, psi, lower.tail=T, log.p=F, recycle=F){
+pzip = function(q, lambda, psi, lower.tail = TRUE, log.p = FALSE, recycle = FALSE){
 
   if(!env_has(e.check, "zi.dens.checks")){
     check_dist_args(recycle=recycle)
@@ -175,7 +175,7 @@ pzip = function(q, lambda, psi, lower.tail=T, log.p=F, recycle=F){
 # zi poisson quantile =========================================================
 #' @rdname dzip
 #' @export
-qzip = function(p, lambda, psi, lower.tail=T, log.p=F, recycle=F){
+qzip = function(p, lambda, psi, lower.tail = TRUE, log.p = FALSE, recycle = FALSE){
 
   if(!env_has(e.check, "zi.dens.checks")){
     check_dist_args(recycle=recycle)
@@ -274,7 +274,7 @@ qzip = function(p, lambda, psi, lower.tail=T, log.p=F, recycle=F){
 #' @example /inst/examples/zinb_dist_ex.R
 #'
 #' @export
-dzinb = function(x, size, psi, mu=NULL, prob=NULL, lower.tail=T, log=F, recycle=F){
+dzinb = function(x, size, psi, mu = NULL, prob = NULL, lower.tail = TRUE, log = FALSE, recycle = FALSE){
 
   if(!env_has(e.check, "zi.dens.checks")){
     check_dist_args(negbin=T, recycle=recycle)
@@ -328,7 +328,7 @@ dzinb = function(x, size, psi, mu=NULL, prob=NULL, lower.tail=T, log=F, recycle=
 # zi nbin cdf =================================================================
 #' @rdname dzinb
 #' @export
-pzinb = function(q, size, psi,  mu=NULL, prob=NULL, lower.tail=T, log.p=F, recycle=F){
+pzinb = function(q, size, psi,  mu = NULL, prob = NULL, lower.tail = TRUE, log.p = FALSE, recycle = FALSE){
 
   if(!env_has(e.check, "zi.dens.checks")){
     check_dist_args(negbin=T, recycle=recycle)
@@ -376,7 +376,7 @@ pzinb = function(q, size, psi,  mu=NULL, prob=NULL, lower.tail=T, log.p=F, recyc
 # zi nbin quantile =============================================================
 #' @rdname dzinb
 #' @export
-qzinb = function(p, size, psi, mu=NULL, prob=NULL, lower.tail=T, log.p=F, recycle=F){
+qzinb = function(p, size, psi, mu = NULL, prob = NULL, lower.tail = TRUE, log.p = FALSE, recycle = FALSE){
 
   if(!env_has(e.check, "zi.dens.checks")){
     check_dist_args(negbin=T, recycle=recycle)
@@ -426,7 +426,7 @@ qzinb = function(p, size, psi, mu=NULL, prob=NULL, lower.tail=T, log.p=F, recycl
 # zi nbin rng =================================================================
 #' @rdname dzinb
 #' @export
-rzinb = function(n, size, psi, mu=NULL, prob=NULL, recycle=F){
+rzinb = function(n, size, psi, mu = NULL, prob = NULL, recycle = FALSE){
 
   check_dist_args(negbin=T, recycle=recycle)
   call = match.call()

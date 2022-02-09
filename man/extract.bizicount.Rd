@@ -4,7 +4,7 @@
 \alias{extract.bizicount}
 \title{Texreg for bizicount objects}
 \usage{
-\method{extract}{bizicount}(model, CI = NULL, id = T)
+\method{extract}{bizicount}(model, CI = NULL, id = TRUE)
 }
 \arguments{
 \item{model}{A \code{\link{bizicount-class}} model object (S3).}

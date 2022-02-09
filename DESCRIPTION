@@ -3,7 +3,16 @@ Title: Bivariate Zero-Inflated Count Models Using Copulas
 Version: 1.0.0
 Authors@R: 
     person("John", "Niehaus", , "jniehaus2257@gmail.com", role = c("aut", "cre"))
-Description: Maximum likelihood estimation of copula-based zero-inflated (and non-inflated) Poisson and negative binomial count models. Supports Frank and Gaussian copulas. Allows for mixed margins (e.g., one margin Poisson, the other zero-inflated negative binomial), and several marginal link functions. Built-in methods for publication-quality tables using 'texreg', and post-estimation diagnostics using 'DHARMa'. The author acknowledges support by NSF DMS-1925119 and DMS-212324.
+Description: Maximum likelihood estimation of copula-based zero-inflated 
+    (and non-inflated) Poisson and negative binomial count models. Supports Frank 
+    and Gaussian copulas. Allows for mixed margins (e.g., one margin Poisson, the 
+    other zero-inflated negative binomial), and several marginal link functions. 
+    Built-in methods for publication-quality tables using 'texreg', and post-estimation 
+    diagnostics using 'DHARMa'. For information on copula regression for count data, 
+    see Genest and Nešlehová (2007) <doi:10.1017/S0515036100014963> as well as 
+    Nikoloulopoulos (2013) <doi:10.1007/978-3-642-35407-6_11>. For information on zero-inflated
+    count regression generally, see Lambert (1992) <doi:10.2307/1269547>. The author 
+    acknowledges support by NSF DMS-1925119 and DMS-212324.
 License: GPL (>= 3)
 Encoding: UTF-8
 URL: https://github.com/jmniehaus/bizicount

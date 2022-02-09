@@ -13,9 +13,9 @@ dzinb(
   psi,
   mu = NULL,
   prob = NULL,
-  lower.tail = T,
-  log = F,
-  recycle = F
+  lower.tail = TRUE,
+  log = FALSE,
+  recycle = FALSE
 )
 
 pzinb(
@@ -24,9 +24,9 @@ pzinb(
   psi,
   mu = NULL,
   prob = NULL,
-  lower.tail = T,
-  log.p = F,
-  recycle = F
+  lower.tail = TRUE,
+  log.p = FALSE,
+  recycle = FALSE
 )
 
 qzinb(
@@ -35,12 +35,12 @@ qzinb(
   psi,
   mu = NULL,
   prob = NULL,
-  lower.tail = T,
-  log.p = F,
-  recycle = F
+  lower.tail = TRUE,
+  log.p = FALSE,
+  recycle = FALSE
 )
 
-rzinb(n, size, psi, mu = NULL, prob = NULL, recycle = F)
+rzinb(n, size, psi, mu = NULL, prob = NULL, recycle = FALSE)
 }
 \arguments{
 \item{x, q}{Vector of quantiles at which to evaluate the PMF and CDF,
@@ -94,7 +94,8 @@ random realizations from the ZINB distribution.
 dzinb(4, size=.25, mu= c(1,2,3), psi=c(.2, .1, .15))
 
 
-# two unique lengthed arguments, one of them is not length 1, error.
+# two unique lengthed arguments, one of them is not length 1
+# error
 \dontrun{
 
      dzinb(5, size=c(.25, .3), mu= c(1,2,3), psi=c(.2, .1, .15))

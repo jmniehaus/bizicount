@@ -193,6 +193,10 @@ fitted.zicreg = function(object, ...) {
 #'
 #' @param ... Ignored.
 #'
+#' @return A numeric vector containing the predictions using the model parameters.
+#'
+#'
+#'
 #' @example /inst/examples/predict_zicreg_ex.R
 #'
 #' @author John Niehaus
@@ -328,7 +332,7 @@ predict.zicreg = function(object,
 #'
 #' @example /inst/examples/extract_zicreg_ex.R
 #' @export
-extract.zicreg = function(model, CI = NULL, id = T) {
+extract.zicreg = function(model, CI = NULL, id = TRUE) {
   if (!is.null(CI) &&
       (CI > 1 || CI < 0))
     stop("`CI` must be between 0 and 1. ")

@@ -14,7 +14,7 @@ bizicount(
   link.ct = c("log", "log"),
   link.zi = c("logit", "logit"),
   starts = NULL,
-  keep = F,
+  keep = FALSE,
   subset,
   na.action,
   weights,
@@ -81,8 +81,38 @@ function, \code{\link[stats]{nlm}}. See 'Details' for some parameters that
 may be useful to alter.}
 }
 \value{
-A list, which is an S3 \code{bizicount-class} object. See link for
-details on object's contents.
+An S3 \code{\link{bizicount-class}} object, which is a list containing:
+\itemize{
+\item \code{coef} -- Coefficients of the model
+\item \code{coef.nid} -- Coefficients without margin IDs
+\item \code{coef.orig} -- Coefficients prior to transformations, for Gaussian
+dependence and negative binomial dispersion.
+\item \code{coef.orig.nid} -- Coefficients prior to transforms, no margin IDs.
+\item \code{se} -- Asymptotic normal-theory standard errors based on observed Fisher Information
+\item \code{se.nid} -- Standard errors without margin IDs
+\item \code{z} -- z-scores for parameter estimates
+\item \code{z.nid} -- z-scores without margin IDs
+\item \code{p} -- p-values for parameter estimates
+\item \code{p.nid} -- p-values without margin IDs
+\item \code{coefmats} -- A list containing coeficient matrices for each margin
+\item \code{loglik} -- Scalar log-likelihood at convergence
+\item \code{grad} -- Numerical gradient vector at convergence
+\item \code{n.iter} -- Number of quasi-newton fitting iterations.
+\item \code{covmat} -- Covariance matrix of parameter estimates based on observed Fisher Information
+\item \code{aic} -- Model's Akaike information
+\item \code{bic} -- Model's Bayesian information criterion
+\item \code{nobs} -- Number of observations
+\item \code{margins} -- Marginal distributions used in fitting
+\item \verb{link.zi, link.ct} -- Names of link functions used in fitting
+\item \verb{invlink.ct, invlink.zi} -- Inverse link functions used in fitting (the
+actual function, not their names)
+\item \code{outcomes} -- Name of the response vector
+\item \code{conv} -- Integer telling convergence status in nlm. See ?nlm.
+\item \code{cop} -- The copula used in fitting
+\item \code{starts} -- list of starting values used
+\item \code{call} -- The model's call
+\item \code{model} -- List containing model matrices, or \code{NULL} if \code{keep = F}.
+}
 }
 \description{
 The main bivariate regression function of the \code{\link{bizicount-package}}
@@ -129,20 +159,17 @@ Numerically, these get rounded to 0 due to underflow. Then, taking logarithms
 results in an infinite likelihood. To avoid this, we bound PMF evaluations
 from below at \code{pmf.min}.
 
-}
-}
-\section{Useful NLM parameters}{
-
-
-Sometimes it may be useful to alter \code{\link[stats]{nlm}}'s default
-parameters. The two that seem to benefit the fitting process the most are
+\item \code{...} -- Sometimes it may be useful to alter \code{\link[stats]{nlm}}'s
+default parameters. This can be done by simply passing those arguments into
+\code{bizicount()}. The two that seem to benefit the fitting process the most are
 \code{stepmax} and \code{steptol}. Readers are referred to the documentation on
 \code{\link[stats]{nlm}} for more details on these parameters. It can be
 useful to lower \code{stepmax} particularly when the Hessian is not negative
 definite at convergence, sometimes to a value between 0 and 1. It can also be
 beneficial to increase \code{steptol}.
-}
 
+}
+}
 \examples{
 ### bizicount example
 

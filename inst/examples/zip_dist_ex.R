@@ -8,7 +8,8 @@ psi = .1
 dzip(x, lambda, psi)
 
 
-#unequal lengths, at least one of them is not length 1, so error.
+# unequal lengths, at least one of them is not length 1,
+# error
 
 \dontrun{
 

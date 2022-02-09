@@ -5,7 +5,8 @@
 dzinb(4, size=.25, mu= c(1,2,3), psi=c(.2, .1, .15))
 
 
-# two unique lengthed arguments, one of them is not length 1, error.
+# two unique lengthed arguments, one of them is not length 1
+# error
 \dontrun{
 
      dzinb(5, size=c(.25, .3), mu= c(1,2,3), psi=c(.2, .1, .15))
