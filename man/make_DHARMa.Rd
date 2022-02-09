@@ -32,7 +32,7 @@ model.
 \examples{
 ## SETUP
 set.seed(123)
-n = 300
+n = 150
 
 # define a function to simulate from a gaussian copula
 # first margin is zero-inflated negative binomial (zinb)
