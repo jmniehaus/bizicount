@@ -1,5 +1,8 @@
 # News
 
+# bizicount 1.0.0.9000
+
+
 # bizicount 1.0.0
 
 The first release of the package, support for Gaussian and Frank copulas,
