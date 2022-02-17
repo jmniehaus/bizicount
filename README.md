@@ -2,8 +2,10 @@
 
   <!-- badges: start -->
   [![R-CMD-check](https://github.com/jmniehaus/bizicount/workflows/R-CMD-check/badge.svg)](https://github.com/jmniehaus/bizicount/actions)
+  [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/bizicount?color=lightgrey)](https://cran.r-project.org/package=bizicount)
   [![minimal R version](https://img.shields.io/badge/R%3E%3D-4.1.0-6666ff.svg)](https://cran.r-project.org/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Downloads:](https://cranlogs.r-pkg.org/badges/grand-total/bizicount?color=red)](https://cran.r-project.org/web/packages/bizicount/index.html)
   <!-- badges: end -->
 
 The `bizicount` R-package is primarily for estimating copula-based bivariate 

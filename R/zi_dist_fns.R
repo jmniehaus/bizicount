@@ -1,6 +1,6 @@
 # zi poisson pmf ===============================================================
 
-#' @name dzip
+#' @name zip
 #' @title The zero-inflated Poisson (ZIP) distribution
 #'
 #' @description These functions are used to evaluate the zero-inflated Poisson
@@ -104,7 +104,7 @@ dzip = function(x, lambda, psi, log = FALSE, recycle = FALSE){
 }
 
 # zi poisson rng ===============================================================
-#' @rdname dzip
+#' @rdname zip
 #' @export
 rzip = function(n, lambda, psi, recycle = FALSE){
 
@@ -133,7 +133,7 @@ rzip = function(n, lambda, psi, recycle = FALSE){
 
 
 # zi poisson cdf ===============================================================
-#' @rdname dzip
+#' @rdname zip
 #' @export
 pzip = function(q, lambda, psi, lower.tail = TRUE, log.p = FALSE, recycle = FALSE){
 
@@ -173,7 +173,7 @@ pzip = function(q, lambda, psi, lower.tail = TRUE, log.p = FALSE, recycle = FALS
 
 
 # zi poisson quantile =========================================================
-#' @rdname dzip
+#' @rdname zip
 #' @export
 qzip = function(p, lambda, psi, lower.tail = TRUE, log.p = FALSE, recycle = FALSE){
 
@@ -222,7 +222,7 @@ qzip = function(p, lambda, psi, lower.tail = TRUE, log.p = FALSE, recycle = FALS
 
 # zi nbin pmf =================================================================
 
-#' @name dzinb
+#' @name zinb
 #' @title The zero-inflated negative binomial (ZINB) distribution
 #'
 #' @description These functions are used to evaluate the zero-inflated negative binomial
@@ -326,7 +326,7 @@ dzinb = function(x, size, psi, mu = NULL, prob = NULL, lower.tail = TRUE, log = 
 
 
 # zi nbin cdf =================================================================
-#' @rdname dzinb
+#' @rdname zinb
 #' @export
 pzinb = function(q, size, psi,  mu = NULL, prob = NULL, lower.tail = TRUE, log.p = FALSE, recycle = FALSE){
 
@@ -374,7 +374,7 @@ pzinb = function(q, size, psi,  mu = NULL, prob = NULL, lower.tail = TRUE, log.p
 
 
 # zi nbin quantile =============================================================
-#' @rdname dzinb
+#' @rdname zinb
 #' @export
 qzinb = function(p, size, psi, mu = NULL, prob = NULL, lower.tail = TRUE, log.p = FALSE, recycle = FALSE){
 
@@ -424,7 +424,7 @@ qzinb = function(p, size, psi, mu = NULL, prob = NULL, lower.tail = TRUE, log.p 
 
 
 # zi nbin rng =================================================================
-#' @rdname dzinb
+#' @rdname zinb
 #' @export
 rzinb = function(n, size, psi, mu = NULL, prob = NULL, recycle = FALSE){
 
