@@ -50,3 +50,28 @@ test_that("univariate dists work with incorrect params", {
 
      }
 )
+
+test_that("all bizicount margins work", {
+     set.seed(123)
+     y1 = rzinb(500, .3, .05, 8)
+     y2 = rzinb(500, .15, .1, 5)
+
+     grid = expand.grid(c("pois", "nbinom", "zip", "zinb"), c("pois", "nbinom", "zip", "zinb"), stringsAsFactors = F)
+     grid$f1 = ifelse(grepl("zi", grid[,1]), "y1 ~ 1 | 1", "y1 ~ 1")
+     grid$f2 = ifelse(grepl("zi", grid[,2]), "y2 ~ 1 | 1", "y2 ~ 1")
+
+
+     out = list()
+     for(i in seq_len(nrow(grid))){
+          out[[i]] = suppressWarnings(tryCatch(
+               bizicount(as.formula(grid$f1[i]),
+                         as.formula(grid$f2[i]),
+                         margins = unlist(grid[i, 1:2])),
+               error = function(e)
+                    NULL
+          ))
+     }
+
+     expect_false(any(sapply(out, is.null)))
+
+})
