@@ -8,7 +8,7 @@ regression model}
 \method{simulate}{zicreg}(object, nsim = 250, seed = 123, ...)
 }
 \arguments{
-\item{object}{A \code{\link{zicreg-class}} omodel bject, as returned by \code{\link{zic.reg}}.}
+\item{object}{A \code{\link{zicreg-class}} model object, as returned by \code{\link{zic.reg}}.}
 
 \item{nsim}{Number of simulated datasets to create.}
 

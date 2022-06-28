@@ -87,7 +87,7 @@ vcov.zicreg = function(object, ...)
 #' @description Simulates responses using the fitted parameters from a
 #'   \code{\link{zicreg-class}} object, as returned by \code{\link{zic.reg}}.
 #'   Primarily useful for methods found in \code{\link[DHARMa]{DHARMa}} package. See 'Examples.'
-#' @param object A \code{\link{zicreg-class}} omodel bject, as returned by \code{\link{zic.reg}}.
+#' @param object A \code{\link{zicreg-class}} model object, as returned by \code{\link{zic.reg}}.
 #' @param nsim Number of simulated datasets to create.
 #' @param seed Random seed for random number generation in simulations. If
 #'   `NULL`, no seed is set.

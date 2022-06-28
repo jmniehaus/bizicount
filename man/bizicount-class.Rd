@@ -34,7 +34,7 @@ dependence and negative binomial dispersion.}
 
 \item{\code{p.nid}}{p-values without margin IDs}
 
-\item{\code{coefmats}}{A list containing coeficient matrices for each margin}
+\item{\code{coefmats}}{A list containing coefficient matrices for each margin}
 
 \item{\code{loglik}}{Scalar log-likelihood at convergence}
 
