@@ -68,5 +68,8 @@ actual function, not their names)}
 \item{\code{call}}{The model's call}
 
 \item{\code{model}}{List containing model matrices, or \code{NULL} if \code{keep = F}.}
+
+\item{\code{scaled}}{List indicating which covariates of each margin were scaled
+according to the \code{scaling} parameter.}
 }}
 

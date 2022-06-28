@@ -115,6 +115,8 @@
 #' \item `starts` -- list of starting values used
 #' \item `call` -- The model's call
 #' \item `model` -- List containing model matrices, or `NULL` if `keep = F`.
+#' \item `scaled` -- Vector indicating which covariates in each margin were scaled
+#' according to the `scaling` parameter.
 #' }
 #'
 #'
@@ -142,12 +144,25 @@
 #'   for the zero-inflation portion of each margin. One of `c("logit", "probit",
 #'   "cauchit", "log", "cloglog")`. Ignored if corresponding `margins` entry is
 #'   not zero-inflated.
+#' @param scaling Character string (partial matching supported) indicating what
+#' type of scaling to apply to covariates (if any). One of `c("none", "1sd", "gelman", "mm")`.
+#'    * `"none"` will apply no alterations to covariates.
+#'    * `"1sd"` will subtract off the mean, and divide by one standard deviation.
+#'    * `"gelman"` will subtract off the mean, and divide by two standard deviations,
+#'       which makes binary and continuous variables have a similar interpretation.
+#'       See Gelman (2008), "Scaling Regression Inputs by Dividing by Two Standard Deviations."
+#'    * `"mm"` will apply min-max normalization so that continuous covariates lie within a unit hypercube.
+#'
+#'  Factor variables, offsets, and the intercept are not scaled. If scaling,
+#'  it is recommended that data be supplied in a dataframe (as opposed to from the global environment),
+#'  otherwise the automated scaling cannot reliably be applied. The names of variables that have been
+#'  scaled are returned as part of the `bizicount` object, in the list-element called `scaled`.
 #' @param starts Numeric vector of starting values for parameter estimates. See
 #'   'Details' section regarding the correct order for the values in this vector.
 #'   If `NULL`, starting values are obtained automatically by a univariate regression fit.
 #' @param keep Logical indicating whether to keep the model matrix in the
 #'   returned model object. Defaults to `FALSE` to conserve memory. NOTE: This
-#'   must be set to `TRUE` to usethe  \code{\link[texreg]{texreg}},
+#'   must be set to `TRUE` to use the  \code{\link[texreg]{texreg}},
 #'   \code{\link{simulate.bizicount}}, \code{\link[stats]{fitted}}, or
 #'   \code{\link{make_DHARMa}} functions with `bizicount` objects.
 #' @param subset A vector indicating the subset of observations to use in
@@ -177,6 +192,7 @@ bizicount = function(fmla1,
                      margins = c("pois", "pois"),
                      link.ct = c("log", "log"),
                      link.zi = c("logit", "logit"),
+                     scaling = "none",
                      starts = NULL,
                      keep = FALSE,
                      subset,
@@ -368,8 +384,8 @@ bizicount = function(fmla1,
     )))
   } # end of starting values function
 
-
-
+  scaling = match_arg(scaling, c("none", "1sd", "gelman", "mm"))
+  scaling = switch(scaling, "none" = 0, "1sd" = 1, "gelman" = 2, "mm" = 3)
   cop     = match_arg(cop, c("frank", "gaus"))
   link.ct = match_arg(link.ct, c("sqrt", "identity", "log"), several.ok = T)
   link.zi = match_arg(link.zi,
@@ -418,6 +434,12 @@ bizicount = function(fmla1,
   if (length(Z) == 1)
     Z[[2]] = NULL
 
+
+  if (scaling != 0){
+    X = lapply(X, scaler, scaling = scaling)
+    Z = lapply(Z, scaler, scaling = scaling)
+  }
+
   offset.ct = lapply(fmla.list,
                      function(x)
                        get.offset(attr(x, "rhs")[[1]], mf))
@@ -441,23 +463,23 @@ bizicount = function(fmla1,
     make.link(x)$linkinv)
   kx = sapply(X, ncol)
   kz = lapply(Z, ncol)
-
   # Get parameter indices corresponding to each part of each margin
   ct.ind = list(1:kx[1],
                 (kx[1] + 1):(sum(kx)))
 
+
   zi.ind = list()
-  kz = unlist(kz)
   if (n.zi == 1)
-    zi.ind[[zipos]] = (sum(kx, 1)):(sum(kx, kz))
+    zi.ind[[zipos]] = (sum(kx, 1)):(sum(kx, unlist(kz)))
   if (n.zi == 2) {
-    zi.ind[[1]] = (sum(kx, 1)):(sum(kx, kz[1]))
-    zi.ind[[2]] = (sum(kx, kz[1], 1)):(sum(kx, kz))
+    zi.ind[[1]] = (sum(kx, 1)):(sum(kx, kz[[1]]))
+    zi.ind[[2]] = (sum(kx, kz[[1]], 1)):(sum(kx, unlist(kz)))
   }
 
   # Get starting values
   if (is.null(starts))
     starts = starts.marginal()
+
 
   # Prevent arg checking in CDF to speed up likelihood evaluations by using counter
   # in e.check (environment.check)
@@ -495,14 +517,19 @@ bizicount = function(fmla1,
       all(abs(out$gradient)  < .05) &&
       !all(out$hessian == 0) &&
       !all(out$gradient == 0) &&
-      anyNA(suppressWarnings(sqrt(diag(
-        solve(out$hessian)
-      ))))) {
+      anyNA(tryCatch(
+        suppressWarnings(sqrt(diag(solve(
+          out$hessian
+        )))),
+        error = function(e)
+          return(NA)
+      ))) {
     warning(
       "nlm() was unable to obtain Hessian matrix, so numDeriv::hessian() was used in computing standard errors.
             Consider reducing 'stepmax' option to nlm to prevent this.
             See `?nlm` for more details on the 'stepmax' option."
     )
+
     out$hessian = numDeriv::hessian(cop.lik, out$estimate, method.args = list(r = 6))
 
   }
@@ -656,7 +683,7 @@ bizicount = function(fmla1,
   append = c(rep("ct1_", kx[1]),
              rep("ct2_", kx[2]),
              if (n.zi == 1)
-               rep(paste0("zi", grep("zi", margins), "_"), kz),
+               rep(paste0("zi", grep("zi", margins), "_"), unlist(kz)),
              if (n.zi == 2) {
                c(rep("zi1_", kz[1]),
                  rep("zi2_", kz[2]))
@@ -675,6 +702,13 @@ bizicount = function(fmla1,
     names(se)[appind] = names(z)[appind] = #
     names(p)[appind] = #
     paste0(append, names(beta)[appind])
+
+  # indicate which vars are scaled
+  scaled = unique(unlist(c(
+    lapply(X, attr, which = "scaled"),
+    lapply(Z, attr, which = 'scaled')
+    )))
+
 
   res =
     list(
@@ -717,7 +751,8 @@ bizicount = function(fmla1,
           weights = weights
         )
       else
-        NULL
+        NULL,
+      scaled = scaled
     )
 
 

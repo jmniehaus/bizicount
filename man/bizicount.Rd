@@ -13,6 +13,7 @@ bizicount(
   margins = c("pois", "pois"),
   link.ct = c("log", "log"),
   link.zi = c("logit", "logit"),
+  scaling = "none",
   starts = NULL,
   keep = FALSE,
   subset,
@@ -49,13 +50,29 @@ for the count portion of each margin. One of \code{c("log", "identity", "sqrt")}
 for the zero-inflation portion of each margin. One of \code{c("logit", "probit", "cauchit", "log", "cloglog")}. Ignored if corresponding \code{margins} entry is
 not zero-inflated.}
 
+\item{scaling}{Character string (partial matching supported) indicating what
+type of scaling to apply to covariates (if any). One of \code{c("none", "1sd", "gelman", "mm")}.
+\itemize{
+\item \code{"none"} will apply no alterations to covariates.
+\item \code{"1sd"} will subtract off the mean, and divide by one standard deviation.
+\item \code{"gelman"} will subtract off the mean, and divide by two standard deviations,
+which makes binary and continuous variables have a similar interpretation.
+See Gelman (2008), "Scaling Regression Inputs by Dividing by Two Standard Deviations."
+\item \code{"mm"} will apply min-max normalization so that continuous covariates lie within a unit hypercube.
+}
+
+Factor variables, offsets, and the intercept are not scaled. If scaling,
+it is recommended that data be supplied in a dataframe (as opposed to from the global environment),
+otherwise the automated scaling cannot reliably be applied. The names of variables that have been
+scaled are returned as part of the \code{bizicount} object, in the list-element called \code{scaled}.}
+
 \item{starts}{Numeric vector of starting values for parameter estimates. See
 'Details' section regarding the correct order for the values in this vector.
 If \code{NULL}, starting values are obtained automatically by a univariate regression fit.}
 
 \item{keep}{Logical indicating whether to keep the model matrix in the
 returned model object. Defaults to \code{FALSE} to conserve memory. NOTE: This
-must be set to \code{TRUE} to usethe  \code{\link[texreg]{texreg}},
+must be set to \code{TRUE} to use the  \code{\link[texreg]{texreg}},
 \code{\link{simulate.bizicount}}, \code{\link[stats]{fitted}}, or
 \code{\link{make_DHARMa}} functions with \code{bizicount} objects.}
 
@@ -112,6 +129,8 @@ actual function, not their names)
 \item \code{starts} -- list of starting values used
 \item \code{call} -- The model's call
 \item \code{model} -- List containing model matrices, or \code{NULL} if \code{keep = F}.
+\item \code{scaled} -- Vector indicating which covariates in each margin were scaled
+according to the \code{scaling} parameter.
 }
 }
 \description{
