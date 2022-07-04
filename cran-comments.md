@@ -1,5 +1,10 @@
 # Bizicount Version 1.1.0 Comments
 
+This is a resubmission. 
+
+Previously there was one note regarding a malformed URL. This URL has been 
+amended and the note no longer occurs. 
+
 # R CMD check results
 
 0 errors | 0 warnings | 0 note 
