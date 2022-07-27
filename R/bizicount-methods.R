@@ -482,3 +482,90 @@ make_DHARMa = function(object, nsim=250, seed=123, method="PIT"){
 
      return(dharmas)
 }
+
+
+
+
+
+# n = 10000
+# x = cbind(1, matrix(rnorm(n*2), ncol = 2))
+# b = c(1,-2, 3)
+# y1 = rpois(n, exp(x %*%b))
+# y2 = bizicount::rzip(n, exp(x%*%b), psi = .35)
+#
+# dat1 = cbind.data.frame(y = y1, x= x)
+# dat2 = cbind.data.frame(y = y2, x=x)
+#
+# mod1 = glm(y~x.2 + x.3, family=poisson(), data = dat1)
+# mod2 = glm(y~ x.2 + x.3, family = poisson(), data = dat2)
+
+zi_test = function(model = NULL, y = NULL, x = NULL, alternative = 'inflated'){
+     alternative = match_arg(alternative, choices = c("inflated", "deflated", "both"))
+     no_x = is.null(x)
+     no_y = is.null(y)
+     no_m = is.null(model)
+
+     if(no_m && no_y)
+          stop("Either `model` or `y` must be specified.")
+
+
+     if(no_m){
+          if(no_x){
+
+               model = glm(y ~ 1, family = poisson(link = "log"))
+
+          } else {
+
+               col_uniques = apply(X = x, 2, function(col) length(unique(col)))
+               if(any(col_uniques == 1))
+                    stop(paste("No intercept should be supplied. Constant column detected at column index", which(col_uniques == 1), '.'))
+
+               model = glm(y ~ x, family = poisson(link="log"))
+
+          }
+     }
+
+
+     if(no_y)
+          y = model.response(model.frame(model))
+
+
+     y0 = (y == 0)
+     V = vcov(model)
+     lam = fitted(model, type = "response")
+     d0 = dpois(0, lam)
+     X = model.matrix(model)
+     puX = (d0 * lam) %*% X
+
+     tstat = sum(y0 - d0)/sqrt((sum(d0*(1-d0)) - puX %*% tcrossprod(V, puX)))
+
+     pval = switch(
+          alternative,
+               "inflated" = pnorm(tstat, lower.tail = F),
+               "deflated" = pnorm(tstat, lower.tail = T),
+               "both"     = 2*pnorm(abs(tstat), lower.tail = F)
+     )
+
+     out = list(
+               H_a = alternative,
+               Z_score = tstat,
+               p_val = pval,
+               n = length(y)
+          )
+
+     class(out) = "zi_test"
+
+     return(out)
+}
+
+
+
+print.zi_test = function(test){
+cat("\n====================================================\n")
+cat("He's Test (2019) for Zero Modification\n")
+cat("--------------------------------------\n\n")
+     print(do.call(cbind.data.frame, test), row.names = F)
+cat("\n====================================================\n")
+}
+
+

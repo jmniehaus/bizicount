@@ -1,8 +1,9 @@
 # News
 
-## bizicount 1.0.0.9000 (dev)
+## bizicount 1.1.0.9000 (dev)
 
-* Dev is same as 1.1.0 right now. 
+* Added `zi_test` function to implement tests for zero-modification as found in 
+He (2019). *This is still experimental and under heavy development* 
 
 ***
 

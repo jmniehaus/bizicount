@@ -29,8 +29,8 @@ functions, and generate random zero-inflated counts (`pzip` or `pzinb`, `dzip` o
 ## Installation
 
 To install from CRAN: 
-`install.packages("bizicount")`
+```install.packages("bizicount")```
 
 To install from GitHub:
-`devtools::install_github("jmniehaus/bizicount", dependencies = TRUE)`
+```devtools::install_github("jmniehaus/bizicount", dependencies = TRUE)```
 
