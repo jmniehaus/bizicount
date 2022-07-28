@@ -485,51 +485,17 @@ make_DHARMa = function(object, nsim=250, seed=123, method="PIT"){
 
 
 
+#' @export
+zi_test = function(model = NULL, alternative = 'inflated'){
+     UseMethod("zi_test", model)
+}
 
-
-# n = 10000
-# x = cbind(1, matrix(rnorm(n*2), ncol = 2))
-# b = c(1,-2, 3)
-# y1 = rpois(n, exp(x %*%b))
-# y2 = bizicount::rzip(n, exp(x%*%b), psi = .35)
-#
-# dat1 = cbind.data.frame(y = y1, x= x)
-# dat2 = cbind.data.frame(y = y2, x=x)
-#
-# mod1 = glm(y~x.2 + x.3, family=poisson(), data = dat1)
-# mod2 = glm(y~ x.2 + x.3, family = poisson(), data = dat2)
-
-zi_test = function(model = NULL, y = NULL, x = NULL, alternative = 'inflated'){
+#' @export
+zi_test.glm = function(model = NULL, alternative = 'inflated'){
      alternative = match_arg(alternative, choices = c("inflated", "deflated", "both"))
-     no_x = is.null(x)
-     no_y = is.null(y)
-     no_m = is.null(model)
-
-     if(no_m && no_y)
-          stop("Either `model` or `y` must be specified.")
 
 
-     if(no_m){
-          if(no_x){
-
-               model = glm(y ~ 1, family = poisson(link = "log"))
-
-          } else {
-
-               col_uniques = apply(X = x, 2, function(col) length(unique(col)))
-               if(any(col_uniques == 1))
-                    stop(paste("No intercept should be supplied. Constant column detected at column index", which(col_uniques == 1), '.'))
-
-               model = glm(y ~ x, family = poisson(link="log"))
-
-          }
-     }
-
-
-     if(no_y)
-          y = model.response(model.frame(model))
-
-
+     y = model.response(model.frame(model))
      y0 = (y == 0)
      V = vcov(model)
      lam = fitted(model, type = "response")
@@ -546,25 +512,70 @@ zi_test = function(model = NULL, y = NULL, x = NULL, alternative = 'inflated'){
                "both"     = 2*pnorm(abs(tstat), lower.tail = F)
      )
 
-     out = list(
+     out = list(data.frame(
                H_a = alternative,
                Z_score = tstat,
-               p_val = pval,
+               p_value = pval,
                n = length(y)
-          )
+          ))
 
+     rownames(out[[1]]) = colnames(model.frame(model))[1]
      class(out) = "zi_test"
 
      return(out)
 }
 
+#' @export
+zi_test.bizicount = function(model = NULL, alternative = 'inflated'){
+     alternative = match_arg(alternative, choices = c("inflated", "deflated", "both"))
+     if(!any(model$margins == 'pois'))
+          stop('At least one margin in `model` must be "pois".')
 
+     m_num = c(which(model$margins == "pois"))
 
-print.zi_test = function(test){
+     y = model$model[["y"]]
+
+     y0 = (y == 0)
+     lam = fitted(model)
+     d0 = dpois(0, lam)
+     X = model$model$X
+
+     out = list()
+     for(i in m_num){
+          y0i = y0[,i]
+          d0i = d0[,i]
+
+          V = solve(crossprod(X[[i]]*lam[,i], X[[i]]))
+          puX = (d0i * lam[,i]) %*% X[[i]]
+
+          tstat = sum(y0i - d0i)/sqrt((sum(d0i*(1-d0i)) - puX %*% tcrossprod(V, puX)))
+          pval = switch(
+               alternative,
+               "inflated" = pnorm(tstat, lower.tail = F),
+               "deflated" = pnorm(tstat, lower.tail = T),
+               "both"     = 2*pnorm(abs(tstat), lower.tail = F)
+          )
+
+          out[[i]] = data.frame(
+                         H_a = alternative,
+                         Z_score = tstat,
+                         p_value = pval,
+                         n = nrow(y)
+                    )
+          rownames(out[[i]]) = colnames(y)[i]
+
+     }
+
+     class(out) = 'zi_test'
+     return(out)
+}
+
+#' @export
+print.zi_test = function(x, ...){
 cat("\n====================================================\n")
 cat("He's Test (2019) for Zero Modification\n")
 cat("--------------------------------------\n\n")
-     print(do.call(cbind.data.frame, test), row.names = F)
+     print(do.call(rbind.data.frame, x))
 cat("\n====================================================\n")
 }
 
