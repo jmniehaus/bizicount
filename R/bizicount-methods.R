@@ -537,7 +537,7 @@ zi_test = function(model, alternative = 'inflated'){
      UseMethod("zi_test", model)
 }
 
-
+#' @export
 zi_test.glm = function(model = NULL, alternative = 'inflated'){
      alternative = match_arg(alternative, choices = c("inflated", "deflated", "both"))
      assert(
@@ -575,7 +575,7 @@ zi_test.glm = function(model = NULL, alternative = 'inflated'){
      return(out)
 }
 
-
+#' @export
 zi_test.bizicount = function(model = NULL, alternative = 'inflated'){
      alternative = match_arg(alternative, choices = c("inflated", "deflated", "both"))
      assert(
