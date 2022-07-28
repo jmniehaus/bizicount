@@ -3,7 +3,7 @@
 ## bizicount 1.1.0.9000 (dev)
 
 * Added `zi_test` function to implement tests for zero-modification as found in 
-He (2019). *This is still experimental and under heavy development* 
+He et al. (2019).
 
 ***
 
