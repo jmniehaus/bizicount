@@ -484,16 +484,66 @@ make_DHARMa = function(object, nsim=250, seed=123, method="PIT"){
 }
 
 
-
+#' @name zi_test
+#' @title He's (2019) test for zero-modification
+#' @description This is an implementation of He et al. (2019)'s test for
+#' zero-modification (discussed further in Tang & Tang (2019)). This is a test of
+#' zero-*modification* instead of *inflation*, because the test is capable of detecting
+#' both excessive or lack of zeros, but cannot determine the cause. For example, a mixed
+#' data generating process could be generating structural zeros, implying a
+#' zero-inflated distribution. However, overdispersion via a negative binomial
+#' may also result in excessive zeros. Thus, the test merely determines whether
+#' there are excessive (or lacking) zeros, but does not determine the process
+#' generating this pattern. That in mind, typical tests in the literature are
+#' inappropriate for zero-modified regression models, namely the Vuong, Wald,
+#' score, and likelihood ratio tests. See the references below for more information
+#' on this claim.
+#'
+#' @details The test compares the
+#' observed proportion of zeros in the data to the expected proportion of zeros
+#' under the null hypothesis of a Poisson distribution. This is done using
+#' estimating equations to account for the fact that the expected proportion is
+#' based on an estimated parameter vector, rather than the true parameter vector.
+#' The test statistic is
+#'
+#' \eqn{\hat s/\hat\sigma_s = \sum_i (r_i - \hat p_i)/\hat \sigma_s}
+#'
+#' where \eqn{r_i = 0} if \eqn{y_i > 0}, otherwise \eqn{r_i = 1}, and \eqn{\hat p = dpois(0, exp(X\hat\beta)) = E(r_i)}
+#' is the expected proportion of zeros under the assumption of a Poisson distribution
+#' generated with covariates \eqn{X} and parameter vector \eqn{\hat\beta}.
+#'
+#' \eqn{\hat\sigma} is then estimated via estimating equations in order to account
+#' for the fact that the plug-in estimate that treats \eqn{\hat \beta} as the
+#' true \eqn{\beta} will underestimate the variance of \eqn{\hat s}.
+#'
+#' Finally, \eqn{\hat s} has an asymptotically normal distribution, with mean
+#' zero and variance \eqn{\sigma^2_s}. See the references below for more discussion and proofs.
+#'
+#' @param model A model object of class \code{\link{bizicount}} or \code{\link{glm}}.
+#' If a \code{bizicount} model, then at least one margin must be specified as \code{"pois"}.
+#' If a \code{glm} model, then the \code{family} must be \code{\link{poisson}}.
+#' @param alternative The alternative hypothesis. One of \code{c("inflated", "deflated", "both")}.
+#' These correspond to an upper tail, lower tail, or two-tailed test, respectively.
+#' Default is \code{"inflated"}. Partial matching supported.
+#' @references He, H., Zhang, H., Ye, P., & Tang, W. (2019). A test of inflated
+#' zeros for Poisson regression models. Statistical methods in medical research,
+#' 28(4), 1157-1169.
+#'
+#' Tang, Y., & Tang, W. (2019). Testing modified zeros for Poisson regression
+#' models. Statistical Methods in Medical Research, 28(10-11), 3123-3141.
+#' @author John Niehaus
 #' @export
-zi_test = function(model = NULL, alternative = 'inflated'){
+zi_test = function(model, alternative = 'inflated'){
      UseMethod("zi_test", model)
 }
 
-#' @export
+
 zi_test.glm = function(model = NULL, alternative = 'inflated'){
      alternative = match_arg(alternative, choices = c("inflated", "deflated", "both"))
-
+     assert(
+          model$family$family == 'poisson',
+          "glm family must be poisson()."
+     )
 
      y = model.response(model.frame(model))
      y0 = (y == 0)
@@ -525,11 +575,13 @@ zi_test.glm = function(model = NULL, alternative = 'inflated'){
      return(out)
 }
 
-#' @export
+
 zi_test.bizicount = function(model = NULL, alternative = 'inflated'){
      alternative = match_arg(alternative, choices = c("inflated", "deflated", "both"))
-     if(!any(model$margins == 'pois'))
-          stop('At least one margin in `model` must be "pois".')
+     assert(
+          any(model$margins == 'pois'),
+          'At least one margin in bizicount model must be "pois".'
+     )
 
      m_num = c(which(model$margins == "pois"))
 
