@@ -37,18 +37,40 @@ estimating equations to account for the fact that the expected proportion is
 based on an estimated parameter vector, rather than the true parameter vector.
 The test statistic is
 
-\eqn{\hat s/\hat\sigma_s = \sum_i (r_i - \hat p_i)/\hat \sigma_s}
+\eqn{\hat s = 1/n\sum_i (r_i - \hat p_i)}
 
-where \eqn{r_i = 0} if \eqn{y_i > 0}, otherwise \eqn{r_i = 1}, and \eqn{\hat p = dpois(0, exp(X\hat\beta)) = E(r_i)}
-is the expected proportion of zeros under the assumption of a Poisson distribution
+where \eqn{r_i = 1} if \eqn{y_i = 0}, otherwise \eqn{r_i = 0}, and \eqn{\hat p = dpois(0, exp(X\hat\beta)) = \hat E(r_i)}
+is the estimated proportion of zeros under the assumption of a Poisson distribution
 generated with covariates \eqn{X} and parameter vector \eqn{\hat\beta}.
 
-\eqn{\hat\sigma} is then estimated via estimating equations in order to account
-for the fact that the plug-in estimate that treats \eqn{\hat \beta} as the
-true \eqn{\beta} will underestimate the variance of \eqn{\hat s}.
+By the central limit theorem, \eqn{\hat s \sim AN(0, \sigma^2_s)}. However,
+estimating \eqn{\hat \sigma_s} by a plug-in estimate using \eqn{\hat\beta} is inefficient
+due to \eqn{\hat \beta} being an random variable with its own variance. Thus,
+\eqn{\hat\sigma} is estimated via estimating equations in order to account for the
+variance in \eqn{\hat \beta}.
 
-Finally, \eqn{\hat s} has an asymptotically normal distribution, with mean
-zero and variance \eqn{\sigma^2_s}. See the references below for more discussion and proofs.
+See the references below for more discussion and proofs.
+}
+\examples{
+set.seed(123)
+n = 500
+u = rpois(n, 3)
+y1 = rzip(n, 12, .2) + u
+y2 = rpois(n, 8) + u
+
+uni1 = glm(y1 ~ 1, family = poisson())
+uni2 = glm(y2 ~ 1, family = poisson())
+
+biv = bizicount(y1~1, y2~1, margins = c("pois", "pois"), keep = TRUE)
+
+zi_test(uni1)
+zi_test(uni2)
+
+zi_test(biv)
+
+
+
+
 }
 \references{
 He, H., Zhang, H., Ye, P., & Tang, W. (2019). A test of inflated

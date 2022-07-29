@@ -5,6 +5,9 @@
 * Added `zi_test` function to implement tests for zero-modification as found in 
 He et al. (2019).
 
+* Change default value of `keep` parameter in `bizicount()` function to `TRUE`
+so that model matrices, etc., are stored in the output object by default. 
+
 ***
 
 ## bizicount 1.1.0

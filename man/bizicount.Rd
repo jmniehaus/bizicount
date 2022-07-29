@@ -15,7 +15,7 @@ bizicount(
   link.zi = c("logit", "logit"),
   scaling = "none",
   starts = NULL,
-  keep = FALSE,
+  keep = TRUE,
   subset,
   na.action,
   weights,

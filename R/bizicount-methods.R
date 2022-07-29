@@ -506,18 +506,19 @@ make_DHARMa = function(object, nsim=250, seed=123, method="PIT"){
 #' based on an estimated parameter vector, rather than the true parameter vector.
 #' The test statistic is
 #'
-#' \eqn{\hat s/\hat\sigma_s = \sum_i (r_i - \hat p_i)/\hat \sigma_s}
+#' \eqn{\hat s = 1/n\sum_i (r_i - \hat p_i)}
 #'
-#' where \eqn{r_i = 0} if \eqn{y_i > 0}, otherwise \eqn{r_i = 1}, and \eqn{\hat p = dpois(0, exp(X\hat\beta)) = E(r_i)}
-#' is the expected proportion of zeros under the assumption of a Poisson distribution
+#' where \eqn{r_i = 1} if \eqn{y_i = 0}, otherwise \eqn{r_i = 0}, and \eqn{\hat p = dpois(0, exp(X\hat\beta)) = \hat E(r_i)}
+#' is the estimated proportion of zeros under the assumption of a Poisson distribution
 #' generated with covariates \eqn{X} and parameter vector \eqn{\hat\beta}.
 #'
-#' \eqn{\hat\sigma} is then estimated via estimating equations in order to account
-#' for the fact that the plug-in estimate that treats \eqn{\hat \beta} as the
-#' true \eqn{\beta} will underestimate the variance of \eqn{\hat s}.
+#' By the central limit theorem, \eqn{\hat s \sim AN(0, \sigma^2_s)}. However,
+#' estimating \eqn{\hat \sigma_s} by a plug-in estimate using \eqn{\hat\beta} is inefficient
+#' due to \eqn{\hat \beta} being an random variable with its own variance. Thus,
+#' \eqn{\hat\sigma} is estimated via estimating equations in order to account for the
+#' variance in \eqn{\hat \beta}.
 #'
-#' Finally, \eqn{\hat s} has an asymptotically normal distribution, with mean
-#' zero and variance \eqn{\sigma^2_s}. See the references below for more discussion and proofs.
+#' See the references below for more discussion and proofs.
 #'
 #' @param model A model object of class \code{\link{bizicount}} or \code{\link{glm}}.
 #' If a \code{bizicount} model, then at least one margin must be specified as \code{"pois"}.
@@ -532,6 +533,7 @@ make_DHARMa = function(object, nsim=250, seed=123, method="PIT"){
 #' Tang, Y., & Tang, W. (2019). Testing modified zeros for Poisson regression
 #' models. Statistical Methods in Medical Research, 28(10-11), 3123-3141.
 #' @author John Niehaus
+#' @example inst/examples/zi_test_ex.R
 #' @export
 zi_test = function(model, alternative = 'inflated'){
      UseMethod("zi_test", model)
@@ -626,7 +628,8 @@ zi_test.bizicount = function(model = NULL, alternative = 'inflated'){
 print.zi_test = function(x, ...){
 cat("\n====================================================\n")
 cat("He's Test (2019) for Zero Modification\n")
-cat("--------------------------------------\n\n")
+cat("--------------------------------------\n")
+cat("\nH_0:  Pr(y = 0 | x) = dpois(0 | x) \n\n\n")
      print(do.call(rbind.data.frame, x))
 cat("\n====================================================\n")
 }

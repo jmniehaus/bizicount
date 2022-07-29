@@ -23,6 +23,8 @@ non-inflated models.
      
 * Produce professional tables in latex, word, or plain-text using the [`texreg`](https://github.com/leifeld/texreg) package (`extract.bizicount`, `extract.zicreg`). 
 
+* Test for zero modification using `zi_test()` [(He et al. 2019).](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6345607/)
+
 * Evaluate univariate zero-inflated count distribution CDFs, PDFs, and quantile 
 functions, and generate random zero-inflated counts (`pzip` or `pzinb`, `dzip` or `dzinb`, `qzip` or `qzinb`, and `rzip` or `rzinb`)
      
