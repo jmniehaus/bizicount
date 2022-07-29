@@ -61,10 +61,9 @@ See Gelman (2008), "Scaling Regression Inputs by Dividing by Two Standard Deviat
 \item \code{"mm"} will apply min-max normalization so that continuous covariates lie within a unit hypercube.
 }
 
-Factor variables, offsets, and the intercept are not scaled. If scaling,
-it is recommended that data be supplied in a dataframe (as opposed to from the global environment),
-otherwise the automated scaling cannot reliably be applied. The names of variables that have been
-scaled are returned as part of the \code{bizicount} object, in the list-element called \code{scaled}.}
+Factor variables, offsets, and the intercept are not scaled. The names of variables that have been
+scaled are returned as part of the \code{bizicount} object, in the list-element called \code{scaled}. Scaling
+is highly reccomended to improve model convergence.}
 
 \item{starts}{Numeric vector of starting values for parameter estimates. See
 'Details' section regarding the correct order for the values in this vector.

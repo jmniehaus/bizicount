@@ -67,10 +67,6 @@ zi_test(uni1)
 zi_test(uni2)
 
 zi_test(biv)
-
-
-
-
 }
 \references{
 He, H., Zhang, H., Ye, P., & Tang, W. (2019). A test of inflated
