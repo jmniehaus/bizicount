@@ -2,11 +2,20 @@
 
 ## bizicount 1.1.0.9000 (dev)
 
-* Added `zi_test` function to implement tests for zero-modification as found in 
+* Add `zi_test` function to implement tests for zero-modification as found in 
 He et al. (2019).
 
 * Change default value of `keep` parameter in `bizicount()` function to `TRUE`
 so that model matrices, etc., are stored in the output object by default. 
+
+* Update documentation with new methods, type fixes.
+
+* Refactor univariate distribution functions for greater speed. 
+
+* Add more tests for univariate distributions. 
+
+* Minor bug fixes in univariate distribution functions.
+
 
 ***
 

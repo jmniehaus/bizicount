@@ -12,8 +12,8 @@
 #'   \code{\link[stats]{simulate}} methods for post-estimation diagnostics using
 #'   the \code{\link[=DHARMa]{DHARMa}} package, as well as an
 #'   \code{\link[texreg]{extract}} method for printing professional tables using
-#'   \code{\link[texreg]{texreg}}. See the 'See Also' section for links to these
-#'   methods.
+#'   \code{\link[texreg]{texreg}}, and a test for zero-modification using `zi_test`.
+#'   See the 'See Also' section for links to these methods.
 #'
 #' @details
 #' \itemize{
@@ -32,14 +32,14 @@
 #'
 #' \item \code{frech.min} -- Changing this argument should almost never be
 #' necessary. Frechet (1951) and Hoeffding (1940) showed that copula CDFs have
-#' bounds of the form \eqn{max{u + v - 1, 0} \le C(u, v) \le min{u, v}}, where
+#' bounds of the form \eqn{max\{u + v - 1, 0\} \le C(u, v) \le min\{u, v\}}, where
 #' \eqn{u} and \eqn{v} are uniform realizations derived from the probability
 #' integral transform. Due to numerical underflow, very small values of \eqn{u}
 #' and \eqn{v} can be rounded to zero. Particularly when evaluating the Gaussian
 #' copula CDF this is problematic, ultimately leading to infinite-valued
 #' likelihood evaluations. Therefore, we impose Frechet-Hoeffding bounds
-#' numerically as \eqn{max{u + v - 1, frech.min} \le C(u, v) \le min{u, v, 1 -
-#' frech.min}}. NOTE: Setting this to 0 imposes the original Frechet bounds
+#' numerically as \eqn{max\{u + v - 1, frech.min\} \le C(u, v) \le min\{u, v, 1 -
+#' frech.min\}}. NOTE: Setting this to 0 imposes the original Frechet bounds
 #' mentioned above.
 #'
 #' \item \code{pmf.min} -- Changing this argument should almost never be
@@ -155,15 +155,14 @@
 #'
 #'  Factor variables, offsets, and the intercept are not scaled. The names of variables that have been
 #'  scaled are returned as part of the `bizicount` object, in the list-element called `scaled`. Scaling
-#'  is highly reccomended to improve model convergence.
+#'  is highly recommended to improve model convergence.
 #' @param starts Numeric vector of starting values for parameter estimates. See
 #'   'Details' section regarding the correct order for the values in this vector.
 #'   If `NULL`, starting values are obtained automatically by a univariate regression fit.
 #' @param keep Logical indicating whether to keep the model matrix in the
-#'   returned model object. Defaults to `FALSE` to conserve memory. NOTE: This
-#'   must be set to `TRUE` to use the  \code{\link[texreg]{texreg}},
-#'   \code{\link{simulate.bizicount}}, \code{\link[stats]{fitted}}, or
-#'   \code{\link{make_DHARMa}} functions with `bizicount` objects.
+#'   returned model object. Defaults to `TRUE`, but can be set to `FALSE` to conserve memory.
+#'   NOTE: Must be `TRUE` to use any post-estimation functions in this package,
+#'   including `zi_test`.
 #' @param subset A vector indicating the subset of observations to use in
 #' estimation.
 #' @param na.action A function which indicates what should happen when the data
@@ -179,6 +178,8 @@
 #' @param ... Additional arguments to be passed on to the quasi-newton fitting
 #'   function, \code{\link[stats]{nlm}}. See 'Details' for some parameters that
 #'   may be useful to alter.
+#'
+#' @seealso \code{\link{extract.bizicount}}, \code{\link{make_DHARMa}}, \code{\link{zi_test}}
 #'
 #' @author John Niehaus
 #'

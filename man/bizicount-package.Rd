@@ -12,7 +12,9 @@ regression functions for univariate zero-inflated count models. Generic
 methods from the \code{\link[texreg]{texreg-package}} and
 \code{\link[DHARMa]{DHARMa}} are extended to support this
 package, namely for the purposes of producing professional tables and
-carrying out post-estimation diagnostics.
+carrying out post-estimation diagnostics. A generic for He et al. (2019)'s
+test for zero-modification is provided, with methods for both \code{bizicount}
+and \code{glm}-class objects.
 }
 \section{Bivariate Functions}{
 
@@ -35,6 +37,10 @@ each margin, for \code{\link{bizicount}} models. A wrapper around
 \item \code{\link{simulate.bizicount}} -- Method that simulates observations
 using the fitted model's parameters, primarily for use with DHARMa.
 
+\item \code{\link{zi_test}} -- Method for testing for marginal zero-modification
+using the esimated parameters from the model. This test is preferable to the
+Vuong, Wald, Score, and LR tests. See He et al. (2019).
+
 }
 }
 
@@ -52,6 +58,10 @@ interfaces with that package's methods.
 
 \item \code{\link{simulate.zicreg}} -- Method for simulating from the fitted
 model. Results are generally used for creating DHARMa objects.
+
+#' \item \code{\link{zi_test}} -- Method for testing for univariate zero-modification
+using the esimated parameters from the model. This test is preferable to the
+Vuong, Wald, Score, and LR tests. See He et al. (2019).
 
 }
 }

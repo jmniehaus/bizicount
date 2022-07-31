@@ -216,9 +216,9 @@ scaler = function(mat, scaling = 1){
 
   mat[,to_scale] = switch(
     scaling,
-    scale(mat[,to_scale], center = T, scale = T),
-    scale(mat[,to_scale], center = T, scale = T)/2,
-    scale(mat[,to_scale], center = mn, scale = (mx - mn))
+     scale(mat[,to_scale], center = T, scale = T),
+     scale(mat[,to_scale], center = T, scale = T)/2,
+     scale(mat[,to_scale], center = mn, scale = (mx - mn))
   )
 
 
@@ -226,3 +226,10 @@ scaler = function(mat, scaling = 1){
   return(mat)
 }
 
+vprob = function(x){
+
+     out = if(!is.null(x)) x <= 1 & x >= 0 else TRUE
+
+     return(out)
+
+}
