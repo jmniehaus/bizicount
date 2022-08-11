@@ -226,9 +226,19 @@ scaler = function(mat, scaling = 1){
   return(mat)
 }
 
-vprob = function(x){
+vprob = function(x, eq = 'both'){
+     eq = match_arg(eq, choices = c("both", "left", "right"))
 
-     out = if(!is.null(x)) x <= 1 & x >= 0 else TRUE
+     out = if(!is.null(x)){
+          switch(eq,
+                 "both" = x <= 1 & x >= 0,
+                 "left" = x < 1 & x >= 0,
+                 "right" = x <= 1 & x > 0)
+     }
+     else{
+          TRUE
+     }
+
 
      return(out)
 

@@ -301,7 +301,7 @@ dzinb = function(x, size, psi, mu = NULL, prob = NULL, lower.tail = TRUE, log = 
      pmf =   alter.cond(log1p(-psi) + dnbinom(x=x, size=size, mu=mu, log=T), suppress=T)
      pmf[x0] = suppressWarnings( log(psi + exp(pmf))[x0] )
 
-     pmf[psi < 0 | psi > 1 ] = NaN
+     pmf[psi < 0 | psi > 1 | prob > 1 | prob <= 0] = NaN
 
      if(!l)
           pmf = exp(pmf)
@@ -328,7 +328,7 @@ pzinb = function(q, size, psi,  mu = NULL, prob = NULL, lower.tail = TRUE, log.p
     mu = size*(1-prob)/prob
 
   n = max(length(q), length(size), length(psi), length(prob), length(mu))
-  if (all(size < 0) || !any(vprob(psi)) || (!is.null(mu) && all(mu < 0)) || !any(vprob(prob))) {
+  if (all(size < 0) || !any(vprob(psi)) || (!is.null(mu) && all(mu < 0)) || !any(vprob(prob, eq = 'right'))) {
        warning(na_warn_nb)
        return(rep(NaN, n))
   }
@@ -373,7 +373,7 @@ qzinb = function(p, size, psi, mu = NULL, prob = NULL, lower.tail = TRUE, log.p 
     mu = size*(1-prob)/prob
 
   n = max(length(p), length(size), length(psi), length(prob), length(mu))
-  if (all(size < 0) || !any(vprob(psi)) || (!is.null(mu) && all(mu < 0)) || !any(vprob(prob)) || !any(vprob(p))) {
+  if (all(size < 0) || !any(vprob(psi)) || (!is.null(mu) && all(mu < 0)) || !any(vprob(prob, eq = 'right')) || !any(vprob(p))) {
        warning(na_warn_nb)
        return(rep(NaN, n))
   }
@@ -397,7 +397,7 @@ qzinb = function(p, size, psi, mu = NULL, prob = NULL, lower.tail = TRUE, log.p 
   )
 
   quant[p < psi] = 0
-  quant[mu < 0 | p < 0 | p > 1 | psi < 0 | psi > 1 | prob > 1 | prob <= 0 | size < 0] = NaN
+  quant[mu < 0 | p < 0 | p > 1 | psi < 0 | psi > 1 | prob > 1 | prob <= 0  | size < 0] = NaN
 
   if(anyNA(quant))
     warning(na_warn_nb)
@@ -414,7 +414,7 @@ rzinb = function(n, size, psi, mu = NULL, prob = NULL, recycle = FALSE){
      check_dist_args(negbin=T, recycle=recycle)
      call = match.call()
 
-     if (all(size < 0) || !any(vprob(psi)) || (!is.null(mu) && all(mu < 0)) || !any(vprob(prob))) {
+     if (all(size < 0) || !any(vprob(psi)) || (!is.null(mu) && all(mu < 0)) || !any(vprob(prob, eq = 'right'))) {
           cat("here")
           warning(na_warn_nb)
           return(rep(NaN, n))

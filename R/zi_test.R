@@ -54,7 +54,7 @@ zi_test = function(model, alternative = 'inflated'){
 }
 
 #' @export
-zi_test.glm = function(model = NULL, alternative = 'inflated'){
+zi_test.glm = function(model, alternative = 'inflated'){
      alternative = match_arg(alternative, choices = c("inflated", "deflated", "both"))
      assert(
           model$family$family == 'poisson',
@@ -92,7 +92,7 @@ zi_test.glm = function(model = NULL, alternative = 'inflated'){
 }
 
 #' @export
-zi_test.bizicount = function(model = NULL, alternative = 'inflated'){
+zi_test.bizicount = function(model, alternative = 'inflated'){
      alternative = match_arg(alternative, choices = c("inflated", "deflated", "both"))
      assert(
           any(model$margins == 'pois'),
