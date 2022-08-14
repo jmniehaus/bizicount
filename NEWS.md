@@ -1,9 +1,20 @@
 # News
 
-## bizicount 1.1.0.9000 (dev)
+## bizicount 1.2.0 
+
+### Major 
 
 * Add `zi_test` function to implement tests for zero-modification as found in 
 He et al. (2019).
+
+* Fix bug in `scaling` parameter where interaction terms would be scaled, not
+just their constituent covariates. 
+
+* Fix bug causing standard error on dependence parameter in Gaussian copula 
+to be incorrect. 
+
+
+### Minor 
 
 * Change default value of `keep` parameter in `bizicount()` function to `TRUE`
 so that model matrices, etc., are stored in the output object by default. 
@@ -12,11 +23,7 @@ so that model matrices, etc., are stored in the output object by default.
 
 * Refactor, add more tests, and minor bug fixes for univariate distribution functions.
 
-* Fix bug in `scaling` parameter where interaction terms would be scaled, not
-just their constituent covariates. 
 
-* Fix bug causing standard error on dependence parameter in Gaussian copula 
-to be incorrect. 
 
 
 ***
