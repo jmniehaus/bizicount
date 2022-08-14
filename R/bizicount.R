@@ -421,7 +421,9 @@ bizicount = function(fmla1,
   mf[[1L]] <- quote(stats::model.frame)
   mf <- eval(mf, parent.frame())
 
+
   y = model.part(fmla, mf, lhs = c(1, 2))
+  mf = if(scaling != 0) scaler(mf, scaling = scaling) else mf
 
   X = lapply(fmla.list, function(x)
     model.matrix(x, mf, rhs = 1))
@@ -434,11 +436,6 @@ bizicount = function(fmla1,
   if (length(Z) == 1)
     Z[[2]] = NULL
 
-
-  if (scaling != 0){
-    X = lapply(X, scaler, scaling = scaling)
-    Z = lapply(Z, scaler, scaling = scaling)
-  }
 
   offset.ct = lapply(fmla.list,
                      function(x)
@@ -547,36 +544,40 @@ bizicount = function(fmla1,
   # transform hessian with change of variables to get correct standard errors for
   # transformed parameters. only necessary if negative binomial margins or gaussian copula
   if (n.nb > 0 || cop == "gaus") {
-    hess.mult = matrix(1,
-                       nrow = nrow(out$hessian),
-                       ncol = ncol(out$hessian))
+       hess.mult = matrix(1,
+                          nrow = nrow(out$hessian),
+                          ncol = ncol(out$hessian))
 
 
-    thpr.inv = if (cop == "gaus")
-      cosh(tail(out$estimate, 1)) ^ 2
-    else
-      1
+       thpr.inv = if (cop == "gaus")
+            cosh(tail(out$estimate, 1)) ^ 2
+       else
+            1
 
-    if (n.nb > 0) {
-      # get dispersion, 1/derivative, reverse them for multiplication below
-      dpr.inv = rev(1 / exp(tail(out$estimate, (n.nb + 1))[1:n.nb]))
-      d = nrow(hess.mult)
 
-      hess.mult[d, ] = thpr.inv # replace hess multiplier row d with 1/derivative of dependence
-      hess.mult[, d] = hess.mult[, d] * thpr.inv # multiply hess multiplier col d by 1/deriv dependence
-      hess.mult[(d - 1), ] = hess.mult[(d - 1), ] * dpr.inv[1] # multiply second to last row of hess by 1/deriv disp.2 (recall use of rev())
-      hess.mult[, (d - 1)] = hess.mult[, (d - 1)] * dpr.inv[1]
+       d = nrow(hess.mult)
 
-      if (n.nb > 1) {
-        hess.mult[(d - 2) , ] = hess.mult[(d - 2) , ] * dpr.inv[2] #first dispersion transformation (recall use of rev())
-        hess.mult[, (d - 2)] = hess.mult[, (d - 2)] * dpr.inv[2]
-      }
-    }
+       hess.mult[d,] = thpr.inv # replace hess multiplier row d with 1/derivative of dependence
+       hess.mult[, d] = hess.mult[, d] * thpr.inv # multiply hess multiplier col d by 1/deriv dependence
 
-    #transform original hess element-wise
-    hess.new = out$hessian * hess.mult
+       if (n.nb > 0) {
+            # get dispersion, 1/derivative, reverse them for multiplication below
+            dpr.inv = rev(1 / exp(tail(out$estimate, (n.nb + 1))[1:n.nb]))
+
+            hess.mult[(d - 1),] = hess.mult[(d - 1),] * dpr.inv[1] # multiply second to last row of hess by 1/deriv disp.2 (recall use of rev())
+            hess.mult[, (d - 1)] = hess.mult[, (d - 1)] * dpr.inv[1]
+
+            if (n.nb > 1) {
+                 hess.mult[(d - 2) ,] = hess.mult[(d - 2) ,] * dpr.inv[2] #first dispersion transformation (recall use of rev())
+                 hess.mult[, (d - 2)] = hess.mult[, (d - 2)] * dpr.inv[2]
+            }
+       }
+
+       #transform original hess element-wise
+       hess.new = out$hessian * hess.mult
   } else
-    hess.new = out$hessian
+       hess.new = out$hessian
+
 
 
   # check that hessian of loglik is neg def
@@ -586,6 +587,7 @@ bizicount = function(fmla1,
     "Hessian of loglik is not negative definite at convergence point; convergence point is not a maximum.",
     type = "warning"
   )
+
 
   #cleanup results for print
   beta = beta.orig = out$estimate
@@ -704,11 +706,7 @@ bizicount = function(fmla1,
     paste0(append, names(beta)[appind])
 
   # indicate which vars are scaled
-  scaled = unique(unlist(c(
-    lapply(X, attr, which = "scaled"),
-    lapply(Z, attr, which = 'scaled')
-    )))
-
+  scaled = attr(mf, which = "scaled")
 
   res =
     list(

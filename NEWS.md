@@ -8,13 +8,15 @@ He et al. (2019).
 * Change default value of `keep` parameter in `bizicount()` function to `TRUE`
 so that model matrices, etc., are stored in the output object by default. 
 
-* Update documentation with new methods, type fixes.
+* Update documentation with new methods, typo fixes.
 
-* Refactor univariate distribution functions for greater speed. 
+* Refactor, add more tests, and minor bug fixes for univariate distribution functions.
 
-* Add more tests for univariate distributions. 
+* Fix bug in `scaling` parameter where interaction terms would be scaled, not
+just their constituent covariates. 
 
-* Minor bug fixes in univariate distribution functions.
+* Fix bug causing standard error on dependence parameter in Gaussian copula 
+to be incorrect. 
 
 
 ***
