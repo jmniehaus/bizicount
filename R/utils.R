@@ -200,7 +200,7 @@ set.defaults = function(de.list, de.names, de.values) {
 scaler = function(df, scaling = 1){
 
   to_scale = !(sapply(df, function(col) length(unique(col)) %in% c(1,2) || is.character(col) || is.factor(col))
-               | grepl("^offset\\(|^\\(weights\\)$", names(df)))
+               | grepl("^offset\\(|^\\(weights\\)$|^I\\(.*\\)$", names(df)))
 
   to_scale[c(1,2)] = c(F,F) # first two are always outcome vectors, never scale them.
 
