@@ -197,15 +197,20 @@ set.defaults = function(de.list, de.names, de.values) {
 
 
 
-scaler = function(df, scaling = 1){
+scaler = function(df, fmla, scaling = 1){
 
-  to_scale = !(sapply(df, function(col) length(unique(col)) %in% c(1,2) || is.character(col) || is.factor(col))
-               | grepl("^offset\\(|^\\(weights\\)$|^I\\(.*\\)$", names(df)))
+  no_scale = c(1, 2, attr(terms(fmla), "offset"), grep("^weights$|^subset$|^drop.unused.levels$", names(df)))
+  check_scale = !(seq(1, ncol(df)) %in% no_scale)
+  to_scale = rep(F, ncol(df))
 
-  to_scale[c(1,2)] = c(F,F) # first two are always outcome vectors, never scale them.
-
-  if(sum(to_scale) == 0)
+  if(sum(check_scale) == 0)
        return(df)
+
+
+  to_scale[check_scale] = !(sapply(df[, check_scale, drop = F],
+                                   function(col) is.character(col) || is.factor(col) || length(unique(col)) %in% c(1,2)
+                            ))
+
 
   if(scaling == 3) {
     mn = apply(df[, to_scale, drop=F], 2, min)
@@ -220,7 +225,7 @@ scaler = function(df, scaling = 1){
   )
 
 
-  attr(df, "scaled") = names(to_scale)[to_scale]
+  attr(df, "scaled") = names(df)[to_scale]
   return(df)
 }
 

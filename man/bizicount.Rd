@@ -61,9 +61,8 @@ See Gelman (2008), "Scaling Regression Inputs by Dividing by Two Standard Deviat
 \item \code{"mm"} will apply min-max normalization so that continuous covariates lie within a unit hypercube.
 }
 
-Factor variables, offsets, and the intercept are not scaled. The names of variables that have been
-scaled are returned as part of the \code{bizicount} object, in the list-element called \code{scaled}. Scaling
-is highly recommended to improve model convergence.}
+Scaling can improve model convergence, at the cost of some interpretability.
+See details for more information.}
 
 \item{starts}{Numeric vector of starting values for parameter estimates. See
 'Details' section regarding the correct order for the values in this vector.
@@ -77,8 +76,7 @@ including \code{zi_test}.}
 \item{subset}{A vector indicating the subset of observations to use in
 estimation.}
 
-\item{na.action}{A function which indicates what should happen when the data
-contain NAs. Default is \code{\link[stats]{na.omit}}.}
+\item{na.action}{Deprecated.}
 
 \item{weights}{An optional numeric vector of weights for each observation.}
 
@@ -157,6 +155,14 @@ follows:
 }
 Thus, in general count parameters should come first, followed by
 zero-inflation parameters, and finally inverse dispersion parameters.
+
+\item \code{scaling} -- Factor variables, offsets, and the intercept are not scaled.
+For interactions and polynomials, the constituent terms are scaled, while the interaction/polynomial
+term is not. Polynomials cannot be entered using \code{poly()} when scaling; they must be wrapped
+in \code{I()}. To prevent particular covariates from being scaled, they can also be
+wrapped in \code{I()} within the model formula. The names of variables that have
+been scaled are returned as part of the \code{bizicount} object, in the list-element
+called \code{scaled}.
 
 \item \code{frech.min} -- Changing this argument should almost never be
 necessary. Frechet (1951) and Hoeffding (1940) showed that copula CDFs have

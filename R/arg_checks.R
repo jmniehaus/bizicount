@@ -35,6 +35,7 @@ check_uni_args = function(pos = 1) {
 check_biv_args = function(pos = 1) {
   args = as.list(parent.frame(pos))
 
+
   with(args, {
     assert(
       length(margins) == 2 &&
@@ -42,6 +43,13 @@ check_biv_args = function(pos = 1) {
       "Margins must be length 2, and be one of 'nbinom', 'pois', 'zip', 'zinb' (partial matching not supported for this arg).",
       pos = -6
     )
+
+     assert(
+       missing(na.action),
+       "`na.action` is deprecated as there is no na.predict method for bizicount. All models implement na.omit.",
+       type = "warning",
+       pos = -2
+     )
 
     assert(
       is.null(starts) || is.null(dim(starts)) && is.numeric(starts),
@@ -51,7 +59,7 @@ check_biv_args = function(pos = 1) {
 
     assert(
       frech.min <= 1e-5 & frech.min >= 0,
-      "Frechtet lower bound must be in [0, .00001].",
+      "Frechet lower bound must be in [0, .00001].",
       pos = -6
     )
 

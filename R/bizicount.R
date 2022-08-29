@@ -30,6 +30,14 @@
 #'  Thus, in general count parameters should come first, followed by
 #'  zero-inflation parameters, and finally inverse dispersion parameters.
 #'
+#'  \item \code{scaling} -- Factor variables, offsets, and the intercept are not scaled.
+#'  For interactions and polynomials, the constituent terms are scaled, while the interaction/polynomial
+#'  term is not. Polynomials cannot be entered using `poly()` when scaling; they must be wrapped
+#'  in `I()`. To prevent particular covariates from being scaled, they can also be
+#'  wrapped in `I()` within the model formula. The names of variables that have
+#'  been scaled are returned as part of the `bizicount` object, in the list-element
+#'  called `scaled`.
+#'
 #' \item \code{frech.min} -- Changing this argument should almost never be
 #' necessary. Frechet (1951) and Hoeffding (1940) showed that copula CDFs have
 #' bounds of the form \eqn{max\{u + v - 1, 0\} \le C(u, v) \le min\{u, v\}}, where
@@ -56,6 +64,7 @@
 #' useful to lower `stepmax` particularly when the Hessian is not negative
 #' definite at convergence, sometimes to a value between 0 and 1. It can also be
 #' beneficial to increase `steptol`.
+#'
 #'
 #' }
 #'
@@ -153,9 +162,9 @@
 #'       See Gelman (2008), "Scaling Regression Inputs by Dividing by Two Standard Deviations."
 #'    * `"mm"` will apply min-max normalization so that continuous covariates lie within a unit hypercube.
 #'
-#'  Factor variables, offsets, and the intercept are not scaled. The names of variables that have been
-#'  scaled are returned as part of the `bizicount` object, in the list-element called `scaled`. Scaling
-#'  is highly recommended to improve model convergence.
+#'  Scaling can improve model convergence, at the cost of some interpretability.
+#'  See details for more information.
+#'
 #' @param starts Numeric vector of starting values for parameter estimates. See
 #'   'Details' section regarding the correct order for the values in this vector.
 #'   If `NULL`, starting values are obtained automatically by a univariate regression fit.
@@ -165,8 +174,7 @@
 #'   including `zi_test`.
 #' @param subset A vector indicating the subset of observations to use in
 #' estimation.
-#' @param na.action A function which indicates what should happen when the data
-#'   contain NAs. Default is \code{\link[stats]{na.omit}}.
+#' @param na.action Deprecated.
 #' @param weights An optional numeric vector of weights for each observation.
 #' @param frech.min Lower boundary for Frechet-Hoeffding bounds on copula CDF.
 #'   Used for computational purposes to prevent over/underflow in likelihood
@@ -413,17 +421,34 @@ bizicount = function(fmla1,
   fmla.list = list(as.Formula(fmla1),
                    as.Formula(fmla2))
 
+  if(any(grepl("^poly\\(.*\\)$", attr(terms(fmla), "term.labels"))))
+       stop("`poly()` not supported in bizicount formulas at this time. Use
+            `I()` to wrap exponents instead.")
+
+
   mf = match.call(expand.dots = F)
-  m = match(c("data", "weights", "subset", "na.action"), names(mf), 0)
+  m = match(c("data", "weights", "subset"), names(mf), 0)
   mf = mf[c(1, m)]
   mf$drop.unused.levels <- TRUE
   mf$formula = fmla
   mf[[1L]] <- quote(stats::model.frame)
-  mf <- eval(mf, parent.frame())
+
+  if(scaling > 0){
+     mf_a = mf
+     mf_a[[1L]] <- quote(stats::get_all_vars)
+     data = eval(mf_a, parent.frame())
+     .d_ = scaler(df = data, fmla = fmla, scaling = scaling)
+     mf[["data"]] = quote(.d_)
+
+     mf = eval(substitute(mf, list(mf = mf, data = .d_)))
+     attr(mf, "scaled") = attr(.d_, "scaled")
+
+  } else {
+     mf <- eval.parent(mf)
+  }
 
 
   y = model.part(fmla, mf, lhs = c(1, 2))
-  mf = if(scaling != 0) scaler(mf, scaling = scaling) else mf
 
   X = lapply(fmla.list, function(x)
     model.matrix(x, mf, rhs = 1))

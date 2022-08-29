@@ -1,5 +1,11 @@
 # News
 
+## bizicount 1.2.0.9000 
+
+* Fixed scaling so that polynomials are not scaled 
+* Deprecated `na.action` as there are no methods for `bizicount` that can
+leverage alternative `na.actions` other than `na.omit`. 
+
 ## bizicount 1.2.0 
 
 ### Major 
