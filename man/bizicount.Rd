@@ -50,19 +50,9 @@ for the count portion of each margin. One of \code{c("log", "identity", "sqrt")}
 for the zero-inflation portion of each margin. One of \code{c("logit", "probit", "cauchit", "log", "cloglog")}. Ignored if corresponding \code{margins} entry is
 not zero-inflated.}
 
-\item{scaling}{Character string (partial matching supported) indicating what
-type of scaling to apply to covariates (if any). One of \code{c("none", "1sd", "gelman", "mm")}.
-\itemize{
-\item \code{"none"} will apply no alterations to covariates.
-\item \code{"1sd"} will subtract off the mean, and divide by one standard deviation.
-\item \code{"gelman"} will subtract off the mean, and divide by two standard deviations,
-which makes binary and continuous variables have a similar interpretation.
-See Gelman (2008), "Scaling Regression Inputs by Dividing by Two Standard Deviations."
-\item \code{"mm"} will apply min-max normalization so that continuous covariates lie within a unit hypercube.
-}
-
-Scaling can improve model convergence, at the cost of some interpretability.
-See details for more information.}
+\item{scaling}{Deprecated. It is recommended that users scale their covariates
+if they encounter convergence issues, which can be accomplished using the
+\code{scale()} function on their data before putting it into the \code{bizicount()} function.}
 
 \item{starts}{Numeric vector of starting values for parameter estimates. See
 'Details' section regarding the correct order for the values in this vector.
@@ -125,8 +115,6 @@ actual function, not their names)
 \item \code{starts} -- list of starting values used
 \item \code{call} -- The model's call
 \item \code{model} -- List containing model matrices, or \code{NULL} if \code{keep = F}.
-\item \code{scaled} -- Vector indicating which covariates in each margin were scaled
-according to the \code{scaling} parameter.
 }
 }
 \description{
@@ -155,14 +143,6 @@ follows:
 }
 Thus, in general count parameters should come first, followed by
 zero-inflation parameters, and finally inverse dispersion parameters.
-
-\item \code{scaling} -- Factor variables, offsets, and the intercept are not scaled.
-For interactions and polynomials, the constituent terms are scaled, while the interaction/polynomial
-term is not. Polynomials cannot be entered using \code{poly()} when scaling; they must be wrapped
-in \code{I()}. To prevent particular covariates from being scaled, they can also be
-wrapped in \code{I()} within the model formula. The names of variables that have
-been scaled are returned as part of the \code{bizicount} object, in the list-element
-called \code{scaled}.
 
 \item \code{frech.min} -- Changing this argument should almost never be
 necessary. Frechet (1951) and Hoeffding (1940) showed that copula CDFs have

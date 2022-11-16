@@ -80,7 +80,7 @@ f2 = y2 ~ X2.1 + X2.2 | Z2.1 + Z2.2
 
 # estimate model
 
-mod = bizicount(f1, f2, dat, cop = "g", margins = c("zip", "zip"), keep = TRUE)
+mod = bizicount(f1, f2, dat, cop = "g", margins = c("zinb", "zip"), keep = TRUE)
 
 print(mod)
 summary(mod)

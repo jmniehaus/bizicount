@@ -2,7 +2,10 @@
 
 ## bizicount 1.2.0.9000 
 
-* Fixed scaling so that polynomials are not scaled 
+* Deprecated `scaling` parameter, as there is no reliable way to scale 
+covariates properly when transformations and interactionsare introduced to model 
+formulas.
+
 * Deprecated `na.action` as there are no methods for `bizicount` that can
 leverage alternative `na.actions` other than `na.omit`. 
 

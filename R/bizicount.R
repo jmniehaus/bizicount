@@ -30,13 +30,6 @@
 #'  Thus, in general count parameters should come first, followed by
 #'  zero-inflation parameters, and finally inverse dispersion parameters.
 #'
-#'  \item \code{scaling} -- Factor variables, offsets, and the intercept are not scaled.
-#'  For interactions and polynomials, the constituent terms are scaled, while the interaction/polynomial
-#'  term is not. Polynomials cannot be entered using `poly()` when scaling; they must be wrapped
-#'  in `I()`. To prevent particular covariates from being scaled, they can also be
-#'  wrapped in `I()` within the model formula. The names of variables that have
-#'  been scaled are returned as part of the `bizicount` object, in the list-element
-#'  called `scaled`.
 #'
 #' \item \code{frech.min} -- Changing this argument should almost never be
 #' necessary. Frechet (1951) and Hoeffding (1940) showed that copula CDFs have
@@ -124,8 +117,6 @@
 #' \item `starts` -- list of starting values used
 #' \item `call` -- The model's call
 #' \item `model` -- List containing model matrices, or `NULL` if `keep = F`.
-#' \item `scaled` -- Vector indicating which covariates in each margin were scaled
-#' according to the `scaling` parameter.
 #' }
 #'
 #'
@@ -153,18 +144,9 @@
 #'   for the zero-inflation portion of each margin. One of `c("logit", "probit",
 #'   "cauchit", "log", "cloglog")`. Ignored if corresponding `margins` entry is
 #'   not zero-inflated.
-#' @param scaling Character string (partial matching supported) indicating what
-#' type of scaling to apply to covariates (if any). One of `c("none", "1sd", "gelman", "mm")`.
-#'    * `"none"` will apply no alterations to covariates.
-#'    * `"1sd"` will subtract off the mean, and divide by one standard deviation.
-#'    * `"gelman"` will subtract off the mean, and divide by two standard deviations,
-#'       which makes binary and continuous variables have a similar interpretation.
-#'       See Gelman (2008), "Scaling Regression Inputs by Dividing by Two Standard Deviations."
-#'    * `"mm"` will apply min-max normalization so that continuous covariates lie within a unit hypercube.
-#'
-#'  Scaling can improve model convergence, at the cost of some interpretability.
-#'  See details for more information.
-#'
+#' @param scaling Deprecated. It is recommended that users scale their covariates
+#' if they encounter convergence issues, which can be accomplished using the
+#' `scale()` function on their data before putting it into the `bizicount()` function.
 #' @param starts Numeric vector of starting values for parameter estimates. See
 #'   'Details' section regarding the correct order for the values in this vector.
 #'   If `NULL`, starting values are obtained automatically by a univariate regression fit.
@@ -211,6 +193,8 @@ bizicount = function(fmla1,
                      ...) {
   #some arg checking
   check_biv_args()
+
+
 
   # Bivariate likelihood (univariate is lower down)
   cop.lik = function(parms) {
@@ -393,7 +377,8 @@ bizicount = function(fmla1,
   } # end of starting values function
 
   scaling = match_arg(scaling, c("none", "1sd", "gelman", "mm"))
-  scaling = switch(scaling, "none" = 0, "1sd" = 1, "gelman" = 2, "mm" = 3)
+  if(scaling != 'none')
+       warning("`scaling` parameter is deprecated; no scaling was applied. Use the `scale()` function on your data prior to inputting it to `bizicount()`.")
   cop     = match_arg(cop, c("frank", "gaus"))
   link.ct = match_arg(link.ct, c("sqrt", "identity", "log"), several.ok = T)
   link.zi = match_arg(link.zi,
@@ -421,10 +406,6 @@ bizicount = function(fmla1,
   fmla.list = list(as.Formula(fmla1),
                    as.Formula(fmla2))
 
-  if(any(grepl("^poly\\(.*\\)$", attr(terms(fmla), "term.labels"))))
-       stop("`poly()` not supported in bizicount formulas at this time. Use
-            `I()` to wrap exponents instead.")
-
 
   mf = match.call(expand.dots = F)
   m = match(c("data", "weights", "subset"), names(mf), 0)
@@ -432,21 +413,7 @@ bizicount = function(fmla1,
   mf$drop.unused.levels <- TRUE
   mf$formula = fmla
   mf[[1L]] <- quote(stats::model.frame)
-
-  if(scaling > 0){
-     mf_a = mf
-     mf_a[[1L]] <- quote(stats::get_all_vars)
-     data = eval(mf_a, parent.frame())
-     .d_ = scaler(df = data, fmla = fmla, scaling = scaling)
-     mf[["data"]] = quote(.d_)
-
-     mf = eval(substitute(mf, list(mf = mf, data = .d_)))
-     attr(mf, "scaled") = attr(.d_, "scaled")
-
-  } else {
-     mf <- eval.parent(mf)
-  }
-
+  mf <- eval.parent(mf)
 
   y = model.part(fmla, mf, lhs = c(1, 2))
 
@@ -730,8 +697,7 @@ bizicount = function(fmla1,
     names(p)[appind] = #
     paste0(append, names(beta)[appind])
 
-  # indicate which vars are scaled
-  scaled = attr(mf, which = "scaled")
+
 
   res =
     list(
@@ -774,8 +740,7 @@ bizicount = function(fmla1,
           weights = weights
         )
       else
-        NULL,
-      scaled = scaled
+        NULL
     )
 
 

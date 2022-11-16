@@ -1,6 +1,6 @@
 ## SETUP
 set.seed(123)
-n = 150
+n = 100
 
 # define a function to simulate from a gaussian copula
 # first margin is zero-inflated negative binomial (zinb)
@@ -82,6 +82,6 @@ mod = bizicount(f1, f2, dat, cop = "g", margins = c("zinb", "zip"), keep=TRUE)
 # diagnose model with DHARMa
 # see end for simulate.bizicount example.
 
-dharm = make_DHARMa(mod, nsim = 150)
+dharm = make_DHARMa(mod, nsim = 100)
 
 lapply(dharm, DHARMa::testResiduals)

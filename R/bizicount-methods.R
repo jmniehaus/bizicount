@@ -158,8 +158,6 @@ print.summary.bizicount = function(x, stars = TRUE, ...){
                     divider("=", width, prepend=T)
           }
 
-          if(!is.null(scaled))
-               cat(paste("**Scaled covariates:", paste(scaled, collapse = ", ")), "\n")
      })
      return(invisible(NULL))
 }
@@ -293,8 +291,6 @@ extract.bizicount = function(model, CI = NULL, id = TRUE){
 #' @slot starts list of starting values used
 #' @slot call The model's call
 #' @slot model List containing model matrices, or `NULL` if `keep = F`.
-#' @slot scaled List indicating which covariates of each margin were scaled
-#' according to the `scaling` parameter.
 #' @export
 setClass("bizicount",
          representation(coef = "numeric",
@@ -325,9 +321,8 @@ setClass("bizicount",
                         cop = "character",
                         starts = "list",
                         call = "language",
-                        model = "ANY",
-                        scaled = "character"
-         )
+                        model = "ANY"
+                       )
 )
 
 setMethod(texreg::extract,

@@ -194,44 +194,7 @@ set.defaults = function(de.list, de.names, de.values) {
 }
 
 
-
-
-
-scaler = function(df, fmla, scaling = 1){
-
-  no_scale = c(1, 2, attr(terms(fmla), "offset"), grep("^weights$|^subset$|^drop.unused.levels$", names(df)))
-  check_scale = !(seq(1, ncol(df)) %in% no_scale)
-  to_scale = rep(F, ncol(df))
-
-  if(sum(check_scale) == 0)
-       return(df)
-
-
-  to_scale[check_scale] = !(sapply(df[, check_scale, drop = F],
-                                   function(col) is.character(col) || is.factor(col) || length(unique(col)) %in% c(1,2)
-                            ))
-
-
-  if(scaling == 3) {
-    mn = apply(df[, to_scale, drop=F], 2, min)
-    mx = apply(df[, to_scale, drop=F], 2, max)
-  }
-
-  df[,to_scale] = switch(
-    scaling,
-     scale(df[,to_scale], center = T, scale = T),
-     scale(df[,to_scale], center = T, scale = T)/2,
-     scale(df[,to_scale], center = mn, scale = (mx - mn))
-  )
-
-
-  attr(df, "scaled") = names(df)[to_scale]
-  return(df)
-}
-
-
-
-
+# check if in unit interval (closed or open)
 vprob = function(x, eq = 'both'){
      eq = match_arg(eq, choices = c("both", "left", "right"))
 
