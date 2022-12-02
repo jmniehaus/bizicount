@@ -141,7 +141,7 @@ zi_test.bizicount = function(model, alternative = 'inflated'){
 #' @export
 print.zi_test = function(x, ...){
      cat("\n====================================================\n")
-     cat("He's Test (2019) for Zero Modification\n")
+     cat("He et al. (2019)'s Test for Zero Modification\n")
      cat("--------------------------------------\n")
      cat("\nH_0:  Pr(y = 0 | x) = dpois(0 | x) \n\n\n")
      print(do.call(rbind.data.frame, x))

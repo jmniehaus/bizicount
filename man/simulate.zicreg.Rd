@@ -28,7 +28,7 @@ Primarily useful for methods found in \code{\link[DHARMa]{DHARMa}} package. See 
 }
 \examples{
 # Simulate some zip data
-n=1000
+n=300
 x = cbind(1, rnorm(n))
 z = cbind(1, rbeta(n, 4, 8))
 b = c(1, 2.2)

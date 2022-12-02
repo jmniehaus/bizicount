@@ -1,6 +1,6 @@
 # News
 
-## bizicount 1.2.0.9000 
+## bizicount 1.3.0
 
 * Deprecated `scaling` parameter, as there is no reliable way to scale 
 covariates properly when transformations and interactionsare introduced to model 

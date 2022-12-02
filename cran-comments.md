@@ -1,27 +1,28 @@
-# Bizicount Version 1.2.0 Comments
+# Bizicount Version 1.3.0 Comments
 
 This is a minor release in the 1.*.0 series. Major changes include:
 
-* Adding a new hypothesis test for zero-modification for glm objects and 
-bizicount objects. 
+* Deprecated `scaling` parameter, as there is no reliable way to scale 
+covariates properly when transformations and interactionsare introduced to model 
+formulas.
 
-* Bug fix for incorrect standard error on the dependence parameter to the 
-gaussian copula
-
-* The internal scaling function was incorrectly scaling interaction terms, 
-not just their constituent variables. 
+* Deprecated `na.action` as there are no methods for `bizicount` that can
+leverage alternative `na.actions` other than `na.omit`. 
 
 See NEWS for other small details.
 
 # R CMD check results
 
-0 errors | 0 warnings | 0 note 
+0 errors | 0 warnings | 1 note 
+
+The release version flags a bad DOI: 10.1177/0962280217749991
+I've manually checked and the DOI does work. Please advise if changes necessary.
 
 # Test Environments 
 
 * Ubuntu oldrel, rel, devel
 * Windows oldrel, rel, devel
-* R-winbuilder devel
+* R-winbuilder oldrel, rel, devel
 
 # Revdep results 
 `devtools::revdep` indicates no reverse dependencies.
