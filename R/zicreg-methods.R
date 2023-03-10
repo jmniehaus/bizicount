@@ -318,6 +318,7 @@ predict.zicreg = function(object,
 #'   \code{\link[texreg]{texreg}} object.
 #' @param id Logical indicating whether to prepend equation identifiers to
 #'   coefficient names (`ct_` for count parameters, `zi_` for zero-inflated parameters)
+#' @param ... Ignored.
 #' @return A \code{\link[texreg]{texreg-class}} object, as produced by
 #'   \code{\link[texreg]{createTexreg}}, which can interface with all of that
 #'   package's generics. See 'Examples.'
@@ -332,7 +333,7 @@ predict.zicreg = function(object,
 #'
 #' @example /inst/examples/extract_zicreg_ex.R
 #' @export
-extract.zicreg = function(model, CI = NULL, id = TRUE) {
+extract.zicreg = function(model, CI = NULL, id = TRUE, ...) {
   if (!is.null(CI) &&
       (CI > 1 || CI < 0))
     stop("`CI` must be between 0 and 1. ")

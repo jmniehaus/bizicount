@@ -176,6 +176,7 @@ print.summary.bizicount = function(x, stars = TRUE, ...){
 #'   desired in the texreg object, otherwise `NULL`.
 #' @param id Logical indicating whether to prepend equation identifiers to
 #'   coefficient names (`ct_` for count parameters, `zi_` for zero-inflated parameters)
+#' @param ... Ignored.
 #' @return A \code{\link[texreg]{texreg-class}} object, as produced by
 #'   \code{\link[texreg]{createTexreg}}, which can interface with all of that
 #'   package's generics.
@@ -192,7 +193,7 @@ print.summary.bizicount = function(x, stars = TRUE, ...){
 #' @seealso \code{\link[texreg]{extract}}, \code{\link[texreg]{createTexreg}},
 #'   \code{\link[bizicount]{bizicount}}
 #' @export
-extract.bizicount = function(model, CI = NULL, id = TRUE){
+extract.bizicount = function(model, CI = NULL, id = TRUE, ...){
      if(!is.null(CI) && (CI > 1 || CI < 0) ) stop("`CI` must be between 0 and 1. ")
      if(!is.logical(id)) stop("`id` must be logical (T/F) value.")
 

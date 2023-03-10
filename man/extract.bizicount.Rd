@@ -4,7 +4,7 @@
 \alias{extract.bizicount}
 \title{Texreg for bizicount objects}
 \usage{
-\method{extract}{bizicount}(model, CI = NULL, id = TRUE)
+\method{extract}{bizicount}(model, CI = NULL, id = TRUE, ...)
 }
 \arguments{
 \item{model}{A \code{\link{bizicount-class}} model object (S3).}
@@ -14,6 +14,8 @@ desired in the texreg object, otherwise \code{NULL}.}
 
 \item{id}{Logical indicating whether to prepend equation identifiers to
 coefficient names (\code{ct_} for count parameters, \code{zi_} for zero-inflated parameters)}
+
+\item{...}{Ignored.}
 }
 \value{
 A \code{\link[texreg]{texreg-class}} object, as produced by

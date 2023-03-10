@@ -4,7 +4,7 @@
 \alias{extract.zicreg}
 \title{Texreg for zicreg objects}
 \usage{
-\method{extract}{zicreg}(model, CI = NULL, id = TRUE)
+\method{extract}{zicreg}(model, CI = NULL, id = TRUE, ...)
 }
 \arguments{
 \item{model}{A zicreg model object, returned by \code{\link{zic.reg}}.}
@@ -14,6 +14,8 @@
 
 \item{id}{Logical indicating whether to prepend equation identifiers to
 coefficient names (\code{ct_} for count parameters, \code{zi_} for zero-inflated parameters)}
+
+\item{...}{Ignored.}
 }
 \value{
 A \code{\link[texreg]{texreg-class}} object, as produced by
