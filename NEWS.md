@@ -1,5 +1,16 @@
 # News
 
+## bizicount 1.3.1
+
+### Major 
+
+* None 
+
+### Minor 
+
+* There was a warning in R-CMD-CHECK on generic method consistency, which was 
+fixed. 
+
 ## bizicount 1.3.0
 
 * Deprecated `scaling` parameter, as there is no reliable way to scale 

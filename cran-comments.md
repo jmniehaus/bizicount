@@ -1,22 +1,24 @@
-# Bizicount Version 1.3.0 Comments
+# Bizicount Version 1.3.1 Comments
 
-This is a minor release in the 1.*.0 series. Major changes include:
+This is a bugfix release to fix R-CMD-CHECK issues found here:
+https://cran.r-project.org/web/checks/check_results_bizicount.html.
 
-* Deprecated `scaling` parameter, as there is no reliable way to scale 
-covariates properly when transformations and interactionsare introduced to model 
-formulas.
+Two issues were raised:
 
-* Deprecated `na.action` as there are no methods for `bizicount` that can
-leverage alternative `na.actions` other than `na.omit`. 
+     1. A warning about generic methods 
+     
+     2. An error stating that `rlang` could not be loaded. 
+     
+The issue about generic methods has been resolved in this release. 
 
-See NEWS for other small details.
+The issue about `rlang` has not been reproduced on the indicated platform. I 
+ran checks on R-winbuilder-devel and received no errors. Thus, I am assuming that
+the namespace issue was server-side or due to an issue with a dependency that 
+has since been resolved. 
 
 # R CMD check results
 
-0 errors | 0 warnings | 1 note 
-
-The release version flags a bad DOI: 10.1177/0962280217749991
-I've manually checked and the DOI does work. Please advise if changes necessary.
+0 errors | 0 warnings | 0 notes
 
 # Test Environments 
 
