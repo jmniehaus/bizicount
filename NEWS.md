@@ -1,5 +1,16 @@
 # News
 
+### bizicount 1.3.2
+
+### Major 
+
+* None
+
+### Minor 
+
+* Added terrorism data from associated journal article. Can be accessed by the 
+object called `terror` which is lazily loaded upon loading the package.
+
 ## bizicount 1.3.1
 
 ### Major 
