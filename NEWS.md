@@ -1,6 +1,6 @@
 # News
 
-### bizicount 1.3.2
+## bizicount 1.3.2
 
 ### Major 
 
