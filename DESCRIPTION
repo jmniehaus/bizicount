@@ -13,7 +13,7 @@ Description: Maximum likelihood estimation of copula-based zero-inflated
     For information on copula regression for count data, see Genest and Nešlehová (2007) 
     <doi:10.1017/S0515036100014963> as well as Nikoloulopoulos (2013) <doi:10.1007/978-3-642-35407-6_11>. 
     For information on zero-inflated count regression generally, see Lambert (1992) 
-    <https:www.jstor.org/stable/1269547?origin=crossref>. The author acknowledges 
+    <https://www.jstor.org/stable/1269547?origin=crossref>. The author acknowledges 
     support by NSF DMS-1925119 and DMS-212324.
 License: GPL (>= 3)
 Encoding: UTF-8
