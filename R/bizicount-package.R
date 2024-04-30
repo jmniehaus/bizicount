@@ -1,3 +1,4 @@
+"_PACKAGE"
 #' @importFrom texreg extract
 #' @importFrom texreg createTexreg
 #' @importFrom DHARMa createDHARMa
@@ -16,7 +17,8 @@
 #'   Models
 #'
 #' @description The package provides regression functions for copula-based
-#'   bivariate count models, with and without zero-inflation, as well as
+#'   bivariate count models based on the paper <doi:10.18637/jss.v109.i01>, with
+#'   and without zero-inflation, as well as
 #'   regression functions for univariate zero-inflated count models. Generic
 #'   methods from the \code{\link[texreg]{texreg-package}} and
 #'   \code{\link[DHARMa]{DHARMa}} are extended to support this
@@ -72,9 +74,8 @@
 #'
 #' }
 #'
-#'
+#' @references <doi:10.18637/jss.v109.i01>
 #' @author John Niehaus
-#' @docType package
 #' @name bizicount-package
 
 NULL

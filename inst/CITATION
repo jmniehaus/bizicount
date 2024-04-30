@@ -1,0 +1,20 @@
+bibentry(bibtype = "Article",
+  title        = "{bizicount}: Bivariate Zero-Inflated Count Copula Regression Using {R}",
+  author       = c(person(given = c("John", "M."),
+                          family = "Niehaus",
+                          email = "jniehaus2257@gmail.com"),
+                   person(given = "Lin",
+                          family = "Zhu"),
+                   person(given = c("Scott", "J."),
+                          family = "Cook"),
+                   person(given = "Mikyoung",
+                          family = "Jun")),
+  journal      = "Journal of Statistical Software",
+  year         = "2024",
+  volume       = "109",
+  number       = "1",
+  pages        = "1--42",
+  doi          = "10.18637/jss.v109.i01",
+  header       = "To cite bizicount in publications use:"
+)
+

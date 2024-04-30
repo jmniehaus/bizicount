@@ -1,7 +1,6 @@
-# Bizicount Version 1.3.1 Comments
+# Bizicount Version 1.3.3 Comments
 
-* Added terrorism data from associated journal article. Can be accessed by the 
-object called `terror` which is lazily loaded upon loading the package.
+* Added citation. The DOI in the CITATION is for a new JSS publication that will be registered after publication on CRAN.
 
 # R CMD check results
 

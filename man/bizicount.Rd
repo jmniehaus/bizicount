@@ -262,6 +262,8 @@ print(mod)
 summary(mod)
 }
 \references{
+\url{doi:10.18637/jss.v109.i01}
+
 Genest C, Nešlehová J (2007). “A primer on copulas for count
 data.” ASTIN Bulletin: The Journal of the IAA, 37(2), 475–515.
 
