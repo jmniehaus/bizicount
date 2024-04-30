@@ -63,7 +63,9 @@
 #'
 #'
 #'
-#' @references Genest C, Nešlehová J (2007). “A primer on copulas for count
+#' @references <doi:10.18637/jss.v109.i01>
+#'
+#'   Genest C, Nešlehová J (2007). “A primer on copulas for count
 #'   data.” ASTIN Bulletin: The Journal of the IAA, 37(2), 475–515.
 #'
 #'   Inouye DI, Yang E, Allen GI, Ravikumar P (2017). “A review of multivariate
@@ -83,6 +85,8 @@
 #'
 #'   Trivedi PK, Zimmer DM (2007). Copula modeling: an introduction for
 #'   practitioners. NowPublishers Inc.
+#'
+#'
 #'
 #' @example inst/examples/bizicount_ex.R
 #'
