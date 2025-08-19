@@ -1,5 +1,26 @@
 # News
 
+## bizicount 1.3.4
+
+### Major 
+
+* None 
+
+### Minor 
+
+* Fixed crossrefs for new CRAN reqs.
+
+
+## bizicount 1.3.3
+
+### Major 
+
+* None 
+
+### Minor 
+
+* Added citation to JSS paper.
+
 ## bizicount 1.3.2
 
 ### Major 

@@ -80,7 +80,7 @@ defaults to \code{rep(0, length(y))}.}
 being supplied.}
 
 \item{keep}{Logical indicating whether to keep the model matrices in the
-returned model object. Must be \code{TRUE} to use \code{\link[=DHARMa]{DHARMa}}
+returned model object. Must be \code{TRUE} to use \code{\link[DHARMa]{DHARMa}}
 and \code{\link[texreg]{texreg}} with the model object, e.g., via
 \code{\link{simulate.zicreg}} and \code{\link{extract.zicreg}}, as well as
 base generics like \code{\link[stats]{fitted}} and
@@ -120,7 +120,7 @@ univariate zero-inflated Poisson and negative binomial regression models
 via maximum likelihood using either the \code{\link[stats]{nlm}} or
 \code{\link[stats]{optim}} optimization functions.  It's class has
 associated \code{\link[stats]{simulate}} methods for post-estimation
-diagnostics using the \code{\link[=DHARMa]{DHARMa}} package, as well as an
+diagnostics using the \code{\link[DHARMa]{DHARMa}} package, as well as an
 \code{\link[texreg]{extract}} method for printing professional tables using
 \code{\link[texreg]{texreg}}. Visit the 'See Also' section for links to these
 methods for \code{zicreg} objects.

@@ -124,7 +124,7 @@ count models via maximum likelihood. Supports the Frank and Gaussian
 copulas, as well as zero-inflated Poisson and negative binomial margins
 (and their non-inflated counterparts). It's class has associated
 \code{\link[stats]{simulate}} methods for post-estimation diagnostics using
-the \code{\link[=DHARMa]{DHARMa}} package, as well as an
+the \code{\link[DHARMa]{DHARMa}} package, as well as an
 \code{\link[texreg]{extract}} method for printing professional tables using
 \code{\link[texreg]{texreg}}, and a test for zero-modification using \code{zi_test}.
 See the 'See Also' section for links to these methods.
